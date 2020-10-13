@@ -4,28 +4,33 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
-
+  - master
+  
 pool:
   vmImage: 'windows-latest'
-#  vmImage: 'ubuntu-latest'
 
 variables:
   buildConfiguration: 'Debug'
+  azureSubscriptionEndpoint: grimmukogooglemail.onmicrosoft.com  
+  WebAppName: BuildNRun
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish and zip'
   inputs:
     command: publish
-    publishWebProjects: True
+    publishWebProjects: False
+    projects: $(SolutionPath)
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
-# this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
-- task: PublishBuildArtifacts@1
+- task: AzureWebApp@1
+  displayName: 'Deploy Azure Web App'
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'BuildNRun'
+    azureSubscription: $(azureSubscriptionEndpoint)
+    appName: $(WebAppName)
+    appType: 'webApp'
+    package: $(Build.ArtifactStagingDirectory)/**/*.zip    
