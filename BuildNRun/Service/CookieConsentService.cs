@@ -13,7 +13,7 @@ namespace BuildNRun.Service {
             if (consentFeature is null) {
                 return (false, null);
             } else {
-                if (consentFeature.CanTrack) {
+                if (consentFeature.CanTrack || consentFeature.HasConsent) {
                     return (false, null);
                 } else { 
                     var consentCookie = consentFeature.CreateConsentCookie();
