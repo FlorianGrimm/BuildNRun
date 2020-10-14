@@ -2,16 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using BuildNRun.Service;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace BuildNRun.Pages
-{
-    [Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = "EasyAuth")]
-    public class AppModel : PageModel
-    {
-        public void OnGet()
-        {
+namespace BuildNRun.Pages {
+    //[Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = "EasyAuth")]
+    public class AppModel : PageModel {
+        private readonly CurrentUserService _CurrentUserService;
+        public bool UserIsAuthenticated;
+        public AppModel(CurrentUserService currentUserService) {
+            this._CurrentUserService = currentUserService;
+        }
+        public void OnGet() {
+            this.UserIsAuthenticated = this._CurrentUserService.UserIsAuthenticated();
         }
     }
 }

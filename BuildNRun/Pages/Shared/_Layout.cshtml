@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http.Features
+
+
+
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="utf-8" />
@@ -9,19 +13,40 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="manifest" href="/manifest.json">
     <link rel="shortcut icon" href="/favicon.ico">
+    @RenderSection("head", required: false)
 </head>
 <body>
     <div id="header">
-        <span id="title">Title</span>
-        <span id="user">
-        @{
-            if ((Context?.User?.Identity is System.Security.Principal.IIdentity id) && (id.IsAuthenticated)) {
-                @id.Name
+        @{ 
+            var (showBanner, consentCookie) = BuildNRun.Service.CookieConsentService.GetCookieShowBanner(this.Context);
+            if (showBanner) {
+                <div id="cookieConsent">                
+                    <button type="button" data-dismiss="alert" data-cookie-string="@consentCookie">
+                        <span aria-hidden="true">Erlaube Cookies</span>
+                    </button>
+                </div>
+                <script>
+                    (function () {
+                        var button = document.querySelector("#cookieConsent button[data-cookie-string]");
+                        button.addEventListener("click", function (event) {
+                            document.cookie = button.dataset.cookieString;
+                        }, false);
+                    })();
+                </script>
             } else { 
-                <a>neuer spieler? / Anmelden</a>
+                <span id="title">Title</span>
+                <span id="user">
+                    @{
+                        if ((Context?.User?.Identity is System.Security.Principal.IIdentity id) && (id.IsAuthenticated)) {
+                            <a href="UserInformation">&ux1f441; @id.Name</a>
+
+                        } else {
+                            <a href="/.auth/login/aad?post_login_redirect_url=/App">Anmelden</a>
+                        }
+                    }
+                </span>
             }
         }
-        </span>
     </div>
     <div id="content">
         @RenderBody()

@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using MaximeRouiller.Azure.AppService.EasyAuth;
+using BuildNRun.Service;
 
 namespace BuildNRun {
     public class Startup {
@@ -24,8 +26,21 @@ namespace BuildNRun {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+#if true
+            services.AddScoped<CurrentUserService>();
+#else
+            services.AddScoped<CurrentUserService, CurrentUserServiceHacking>((sp)=>new CurrentUserServiceHacking(sp.GetRequiredService<Microsoft.AspNetCore.Http.IHttpContextAccessor>()));
+#endif
             services.AddRazorPages();
             services.AddAuthentication().AddEasyAuthAuthentication((o) => { });
+            services.AddSession(options =>
+            {
+                
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.IsEssential = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
