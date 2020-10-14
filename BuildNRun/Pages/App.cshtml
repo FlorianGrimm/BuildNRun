@@ -1,0 +1,20 @@
+﻿@page
+@model BuildNRun.Pages.AppModel
+@{
+
+}
+
+<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AmyGeNkzX6tFlGE0bwaRsfrwARVEuyxO_ny8FMWnwgdIVuYN0wSdPmEpzLycbEwk'></script>
+<script type='text/javascript'>
+    var map;
+    function loadMapScenario() {
+        map = new Microsoft.Maps.Map(document.getElementById('myMap'), {});
+    }
+</script>
+<div id='printoutPanel'></div>
+
+<div id='myMap' style='width: 100vw; height: 100vh;'></div>
+
+<script type='text/javascript'>
+    loadMapScenario();
+</script>

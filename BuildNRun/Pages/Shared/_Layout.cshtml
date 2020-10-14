@@ -11,7 +11,21 @@
     <link rel="shortcut icon" href="/favicon.ico">
 </head>
 <body>
-    @RenderBody()
+    <div id="header">
+        <span id="title">Title</span>
+        <span id="user">
+        @{
+            if ((Context?.User?.Identity is System.Security.Principal.IIdentity id) && (id.IsAuthenticated)) {
+                @id.Name
+            } else { 
+                <a>neuer spieler? / Anmelden</a>
+            }
+        }
+        </span>
+    </div>
+    <div id="content">
+        @RenderBody()
+    </div>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>

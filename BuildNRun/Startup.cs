@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using MaximeRouiller.Azure.AppService.EasyAuth;
 
 namespace BuildNRun {
     public class Startup {
@@ -24,6 +25,7 @@ namespace BuildNRun {
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddAuthentication().AddEasyAuthAuthentication((o) => { });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,10 +44,12 @@ namespace BuildNRun {
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             //app.UseSpaStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

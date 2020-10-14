@@ -7,30 +7,29 @@ trigger:
   - master
   
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
   buildConfiguration: 'Debug'
-  azureSubscriptionEndpoint: grimmukogooglemail.onmicrosoft.com  
-  WebAppName: BuildNRun
 
 steps:
+- script: dotnet restore
+  displayName: 'dotnet build $(buildConfiguration)'
+
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish and zip'
   inputs:
-    command: publish
-    publishWebProjects: False
-    projects: $(SolutionPath)
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(BuildConfiguration)'
     zipAfterPublish: True
-
-- task: AzureWebApp@1
-  displayName: 'Deploy Azure Web App'
+    
+- task: AzureRmWebAppDeployment@4
   inputs:
-    azureSubscription: $(azureSubscriptionEndpoint)
-    appName: $(WebAppName)
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'BuildNRunResourceGroup'
     appType: 'webApp'
-    package: $(Build.ArtifactStagingDirectory)/**/*.zip    
+    WebAppName: 'BuildNRun'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
