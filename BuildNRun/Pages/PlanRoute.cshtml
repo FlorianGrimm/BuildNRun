@@ -1,0 +1,32 @@
+﻿@page
+@model BuildNRun.Pages.PlanRouteModel
+@{
+}
+@section head {
+    @{
+        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AmyGeNkzX6tFlGE0bwaRsfrwARVEuyxO_ny8FMWnwgdIVuYN0wSdPmEpzLycbEwk'></script>
+        <script type='text/javascript'>
+            var map;
+            function loadMapScenario() {
+                map = new Microsoft.Maps.Map(document.getElementById('root'), {});
+            }
+        </script>
+    }
+}
+
+<div id="root" style='width: 100vw; height: 80vh;'>loading...</div>
+
+<!--
+<div id='printoutPanel'></div>
+-->
+
+@section Scripts {
+<script type='text/javascript'>
+    loadMapScenario();
+</script>
+    <!--
+
+        <script type='text/javascript' src='/js/bundle.js'></script>
+    -->
+}
+

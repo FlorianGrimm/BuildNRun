@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
 namespace BuildNRun.Pages {
+    [Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute()]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class ErrorModel : PageModel {
         public string RequestId { get; set; }

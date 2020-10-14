@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿#if false
+using Microsoft.AspNetCore.Http;
 
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,5 @@ namespace BuildNRun.Service {
         public virtual bool UserIsAuthenticated()
             => ((this._HttpContextAccessor.HttpContext?.User?.Identity is System.Security.Principal.IIdentity id) && (id.IsAuthenticated));
     }
-    public class CurrentUserServiceHacking : CurrentUserService {
-        public CurrentUserServiceHacking(IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor) {
-        }
-        public bool HackingUserIsAuthenticated { get; set; }
-        public override bool UserIsAuthenticated() => this.HackingUserIsAuthenticated;
-    }
 }
+#endif

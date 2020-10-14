@@ -1,49 +1,48 @@
+using BuildNRun.Service;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
+using Microsoft.IdentityModel.Tokens;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using MaximeRouiller.Azure.AppService.EasyAuth;
-using BuildNRun.Service;
-
 namespace BuildNRun {
     public class Startup {
-        public Startup(IConfiguration configuration)
-        {
+        public Startup(IConfiguration configuration) {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+        public void ConfigureServices(IServiceCollection services) {
+            /*
             services.AddHttpContextAccessor();
-#if true
             services.AddScoped<CurrentUserService>();
-#else
-            services.AddScoped<CurrentUserService, CurrentUserServiceHacking>((sp)=>new CurrentUserServiceHacking(sp.GetRequiredService<Microsoft.AspNetCore.Http.IHttpContextAccessor>()));
-#endif
-            services.AddRazorPages();
-            services.AddAuthentication().AddEasyAuthAuthentication((o) => { });
-            services.AddSession(options =>
-            {
-                options.Cookie.SameSite = SameSiteMode.Unspecified;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.IsEssential = true;
-            });
+            */
 
+            //services.AddSession(options =>
+            //{
+            //    options.Cookie.SameSite = SameSiteMode.Unspecified;
+            //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            //    options.Cookie.IsEssential = true;
+            //});
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
+            services.Configure<CookiePolicyOptions>(options => {
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
                 //options.OnAppendCookie = cookieContext =>
@@ -51,50 +50,42 @@ namespace BuildNRun {
                 //options.OnDeleteCookie = cookieContext =>
                 //    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             });
+
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
+
+            services.AddAuthorization(options => {
+                // By default, all incoming requests will be authorized according to the default policy
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
+            services.AddRazorPages()
+                .AddMvcOptions(options => { })
+                .AddMicrosoftIdentityUI();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
+            } else {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-            
-            app.UseCookiePolicy();
-
             app.UseStaticFiles();
-
-            //app.UseSpaStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapRazorPages();
-            });
-#if false
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
+            app.UseCookiePolicy();
 
-                //if (env.IsDevelopment())
-                //{
-                //    spa.UseReactDevelopmentServer(npmScript: "start");
-                //}
+            app.UseEndpoints(endpoints => {
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
-#endif
         }
     }
 }

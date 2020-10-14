@@ -9,3 +9,12 @@ https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-ho
 ## Bing Maps
 https://www.bing.com/api/maps/sdkrelease/mapcontrol/isdk/loadmapasync#HTML
 https://www.bingmapsportal.com/
+
+## Template
+  dotnet new webapp2 --auth MultiOrg
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+    "TenantId": "common",
+    "ClientId": "11111111-1111-1111-11111111111111111",
+    "CallbackPath": "/signin-oidc"
+  },
