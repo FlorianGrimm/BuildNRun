@@ -20,10 +20,12 @@
         @{ 
             var (showBanner, consentCookie) = BuildNRun.Service.CookieConsentService.GetCookieShowBanner(this.Context);
             if (showBanner) {
-                <div id="cookieConsent">                
-                    <button type="button" data-dismiss="alert" data-cookie-string="@consentCookie">
-                        <span aria-hidden="true">Erlaube Cookies</span>
-                    </button>
+                <div id="cookieConsent">    
+                    <form src="">
+                        <button type="submit" data-dismiss="alert" data-cookie-string="@consentCookie">
+                            <span aria-hidden="true">Erlaube Cookies</span>
+                        </button>
+                    </form>
                 </div>
                 <script>
                     (function () {

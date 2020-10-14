@@ -36,10 +36,20 @@ namespace BuildNRun {
             services.AddAuthentication().AddEasyAuthAuthentication((o) => { });
             services.AddSession(options =>
             {
-                
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.IsEssential = true;
+            });
+
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.Strict;
+                //options.OnAppendCookie = cookieContext =>
+                //    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                //options.OnDeleteCookie = cookieContext =>
+                //    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             });
         }
 
@@ -58,6 +68,9 @@ namespace BuildNRun {
             }
 
             app.UseHttpsRedirection();
+            
+            app.UseCookiePolicy();
+
             app.UseStaticFiles();
 
             //app.UseSpaStaticFiles();
