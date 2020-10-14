@@ -1,24 +1,21 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace BuildNRun.Service {
     public class CookieConsentService {
-        public static (bool showBanner, string? consentCookie) GetCookieShowBanner(HttpContext httpContext) {
+        public static (bool showBanner, string? consentCookie, string? userName) GetCookieShowBanner(HttpContext httpContext) {
             var consentFeature = httpContext.Features.Get<ITrackingConsentFeature>();
+            var userName = ((httpContext?.User?.Identity is System.Security.Principal.IIdentity id) && (id.IsAuthenticated)) ? id.Name : null;
+
             if (consentFeature is null) {
-                return (false, null);
+                return (false, null, userName);
+            } else if (consentFeature.CanTrack) {
+                return (false, null, userName);
+            } else if (userName is object) {
+                consentFeature.GrantConsent();
+                return (false, null, userName);
             } else {
-                if (consentFeature.CanTrack || consentFeature.HasConsent) {
-                    return (false, null);
-                } else { 
-                    var consentCookie = consentFeature.CreateConsentCookie();
-                    return (true, consentCookie);
-                }
+                return (true, consentFeature.CreateConsentCookie(), userName);
             }
         }
     }
