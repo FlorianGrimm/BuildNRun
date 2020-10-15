@@ -1,8 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http.Features
-
-
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="utf-8" />
@@ -36,7 +32,7 @@
                     })();
                 </script>
             } else { 
-                <span id="title">Title</span>
+                <span id="title">@ViewData["Title"]</span>
                 <span id="user">
                     @{
                         if (userName is null) {

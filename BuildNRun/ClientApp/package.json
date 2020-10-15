@@ -17,6 +17,7 @@
   },
   "scripts": {
     "start": "rimraf ./build",
-    "build": "./node_modules/.bin/tsc"
+    "compile": "./node_modules/.bin/tsc --noEmit",
+    "build": "./node_modules/.bin/webpack-cli  --config webpack.config.js"
   }
 }

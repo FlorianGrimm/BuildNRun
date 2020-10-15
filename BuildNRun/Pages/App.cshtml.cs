@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BuildNRun.Pages {
-    //[Microsoft.AspNetCore.Authorization.Authorize(AuthenticationSchemes = "EasyAuth")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute()]
     public class AppModel : PageModel {
         //public bool UserIsAuthenticated;
         //private readonly CurrentUserService _CurrentUserService;

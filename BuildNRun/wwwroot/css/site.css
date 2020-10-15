@@ -7,13 +7,21 @@
 
     body > div#header {
         background-color: black;
-        color: green;
+        color: white;
         margin: 0;
         padding: 2px;
         width: 100%;
         height: 24px;
         position: absolute;
     }
+
+        body > div#header a,
+        body > div#header a:active,
+        body > div#header a:hover,
+        body > div#header a:link,
+        body > div#header a:visited {
+            color: white
+        }
 
         body > div#header > #title {
         }
@@ -22,7 +30,7 @@
             margin-left:auto;
             margin-right:0;
             position:absolute;
-            right:0;
+            right:10px;
         }
 
     body > div#content {
