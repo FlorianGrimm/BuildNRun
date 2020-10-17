@@ -1,0 +1,42 @@
+﻿@page
+@model BuildNRun.Pages.ManifestModel
+@{
+    Layout = "";
+    Response.ContentType = "application/json";
+}
+{
+    "short_name": "BuildNRun on @(this.Model.SchemeHost)",
+    "name": "BuildNRun on @(this.Model.SchemeHost)",
+    "icons": [{
+        "src": "favicon48.png",
+        "sizes": "48x48",
+        "type": "image/png"
+    }, {
+        "src": "favicon72.png",
+        "sizes": "72x72",
+        "type": "image/png"
+    }, {
+        "src": "favicon96.png",
+        "sizes": "96x96",
+        "type": "image/png"
+    }, {
+        "src": "favicon144.png",
+        "sizes": "144x144",
+        "type": "image/png"
+    }, {
+        "src": "favicon192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+    }],
+    "scope": "@(this.Model.SchemeHost)/",
+    "start_url": "@(this.Model.SchemeHost)/App",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "serviceworker": {
+        "src": "@(this.Model.SchemeHost)/js/service-worker.js",
+        "scope": "/app",
+        "type": "",
+        "update_via_cache": "none"
+    }
+}

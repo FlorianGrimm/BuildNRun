@@ -3,4 +3,15 @@
 @{
     ViewData["Title"] = "Benutzer";
 }
-TODO
+@{
+    if((true == this.HttpContext.User?.Identity?.IsAuthenticated)) {
+        <div>
+            <div>@(this.HttpContext.User?.Identity?.Name)</div>
+        </div>
+    } else {
+        <div>
+            Nicht angemeldet.
+        </div>
+    }
+}
+<a href="/">Zurück</a>

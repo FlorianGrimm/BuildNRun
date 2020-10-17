@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BuildNRun.Pages {
-    [Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute()]
+    //[Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute()]
+    [Route("App/{**args}")]
     public class AppModel : PageModel {
         //public bool UserIsAuthenticated;
         //private readonly CurrentUserService _CurrentUserService;

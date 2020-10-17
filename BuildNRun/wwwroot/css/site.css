@@ -9,10 +9,13 @@
         background-color: black;
         color: white;
         margin: 0;
-        padding: 2px;
-        width: 100%;
-        height: 24px;
+        padding: 0;
+        width: 100vw;
+        height: 30px;
         position: absolute;
+        border-bottom-color:white;
+        border-bottom-style:solid;
+        border-bottom-width:1px;
     }
 
         body > div#header a,
@@ -24,21 +27,31 @@
         }
 
         body > div#header > #title {
+            padding: 4px 2px 2px 2px;
+            height: 26px;
+            display: inline-block;
+            vertical-align: baseline;
         }
 
         body > div#header > #user {
-            margin-left:auto;
-            margin-right:0;
-            position:absolute;
-            right:10px;
+            margin-left: auto;
+            margin-right: 0;
+            position: absolute;
+            right: 10px;
+            padding: 2px;
+            height: 26px;
+            display: inline-block;
+            vertical-align:baseline;
         }
-
+            body > div#header a {
+                text-decoration: none;
+            }
     body > div#content {
         background-color: yellow;
         margin: 0;
         padding: 0;
-        width: 100%;
+        width: 100vw;
         position: absolute;
-        top: 24px;
+        top: 30px;
         bottom: 0;
     }

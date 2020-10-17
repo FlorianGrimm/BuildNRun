@@ -7,7 +7,6 @@
     <meta name="AdsBot-Google" content="noindex" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="manifest" href="/manifest.json">
     <link rel="shortcut icon" href="/favicon.ico">
     @RenderSection("head", required: false)
 </head>
@@ -16,9 +15,10 @@
         @{ 
             var (showBanner, consentCookie, userName) = BuildNRun.Service.CookieConsentService.GetCookieShowBanner(this.Context);
             if (showBanner) {
-                <div id="cookieConsent">    
-                    <form src="">
-                        <button type="submit" data-dismiss="alert" data-cookie-string="@consentCookie">
+                <div id="cookieConsent" style="width:80%; height:26px;">    
+                    <form src="@($"{this.Context.Request.Path}{this.Context.Request.QueryString}")" 
+                          style="margin-left:100px; margin-right:100px;">
+                        <button type="submit" data-dismiss="alert" data-cookie-string="@consentCookie" style="width:100%;">
                             <span aria-hidden="true">Erlaube Cookies</span>
                         </button>
                     </form>
@@ -32,13 +32,15 @@
                     })();
                 </script>
             } else { 
-                <span id="title">@ViewData["Title"]</span>
+                <span id="title">
+                        @ViewData["Title"]
+                </span>
                 <span id="user">
                     @{
                         if (userName is null) {
                             <a href="/.auth/login/aad?post_login_redirect_url=/App">Anmelden</a>
                         } else {
-                            <a href="UserInformation">&ux1f441; @userName</a>
+                            <a href="UserInformation">&#x1f441; @userName</a>
                         }
                     }
                 </span>
@@ -48,7 +50,6 @@
     <div id="content">
         @RenderBody()
     </div>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
