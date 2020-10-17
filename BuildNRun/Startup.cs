@@ -15,7 +15,6 @@ using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
 
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +27,11 @@ namespace BuildNRun {
         public Startup(IConfiguration configuration) {
             Configuration = configuration;
             bool onAzure = false;
-            if(string.Equals(System.Environment.GetEnvironmentVariable("USERDOMAIN"), "WORKGROUP", StringComparison.Ordinal)) {
-                var computername = System.Environment.GetEnvironmentVariable("COMPUTERNAME"); // COMPUTERNAME=RD501AC552AFB6
-                var username = System.Environment.GetEnvironmentVariable("USERNAME"); // USERNAME=RD501AC552AFB6$
-                if(string.Equals(computername, (username + "$"), StringComparison.Ordinal)) {
+            string userdomain = System.Environment.GetEnvironmentVariable("USERDOMAIN") ?? string.Empty;
+            if (string.Equals(userdomain, "WORKGROUP", StringComparison.Ordinal)) {
+                // COMPUTERNAME=RD501AC552AFB6
+                var computername = System.Environment.GetEnvironmentVariable("COMPUTERNAME") ?? string.Empty;
+                if (computername.StartsWith("RD")) {
                     onAzure = true;
                 }
             }
@@ -64,32 +64,33 @@ namespace BuildNRun {
                 //    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             });
 
-            if(this.onAzure) {
+            if (this.onAzure) {
                 services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
             } else {
                 services.AddAuthentication("Test")
-                       .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                           "Test", options => { });
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
             }
 
             services.AddAuthorization(options => {
                 // By default, all incoming requests will be authorized according to the default policy
                 options.FallbackPolicy = options.DefaultPolicy;
             });
-            services.AddRazorPages(options=> {
-                options.Conventions.AddPageRoute("/App", "/App/{**args}");
-                options.Conventions.AddPageRoute("/Manifest", "/manifest.webmanifest");
+            services.AddRazorPages(options => {
+                    options.Conventions.AddPageRoute("/App", "/App/{**args}");
+                    options.Conventions.AddPageRoute("/Manifest", "/manifest.webmanifest");
                 })
-                .AddMvcOptions(options => { })
-                .AddMicrosoftIdentityUI();
-
-            //services.AddSwaggerDocument();
+                .AddMvcOptions(options => { 
+                })
+                .AddMicrosoftIdentityUI()
+                ;
+            services.AddApiExplorerServices();
+            services.AddSwaggerDocument();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-            if(env.IsDevelopment()) {
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             } else {
                 app.UseExceptionHandler("/Error");
@@ -106,13 +107,13 @@ namespace BuildNRun {
 
             app.UseCookiePolicy();
 
-            //app.UseOpenApi();
-            //app.UseSwaggerUi3();
-
             app.UseEndpoints(endpoints => {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
         }
     }
 }
