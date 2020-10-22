@@ -3,21 +3,23 @@ var positionWatcher = 0;
 export default class GeoLocationService {
     currentSuccessCallback: PositionCallback | null;
     currentErrorCallback: PositionErrorCallback | null;
-    currentPosition: Position|null;
+    currentPosition: Position | null;
+
     constructor() {
         this.currentSuccessCallback = null;
         this.currentErrorCallback = null;
-        this.currentPosition=null;
+        this.currentPosition = null;
     }
 
-    watchPositionSuccessCallback = (position: Position) => {
-        this.currentPosition=position;
-        if (this.currentSuccessCallback!==null){
+    private watchPositionSuccessCallback = (position: Position) => {
+        this.currentPosition = position;
+        if (this.currentSuccessCallback !== null) {
             this.currentSuccessCallback(position);
         }
     };
-    watchPositionErrorCallback = (positionError: PositionError) => {
-        if (this.currentErrorCallback!==null){
+
+    private watchPositionErrorCallback = (positionError: PositionError) => {
+        if (this.currentErrorCallback !== null) {
             this.currentErrorCallback(positionError);
         }
     };
@@ -34,6 +36,7 @@ export default class GeoLocationService {
             });
         }
     }
+ 
     watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback, options?: PositionOptions) {
         this.currentSuccessCallback = successCallback || null;
         this.currentErrorCallback = errorCallback || null;
@@ -46,12 +49,12 @@ export default class GeoLocationService {
             return false;
         }
     }
-    
-    clearWatch(){
+
+    clearWatch() {
         if (navigator.geolocation) {
             if (positionWatcher !== 0) {
                 navigator.geolocation.clearWatch(positionWatcher);
-                positionWatcher=0;
+                positionWatcher = 0;
             }
         }
     }

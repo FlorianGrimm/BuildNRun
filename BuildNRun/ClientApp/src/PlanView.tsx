@@ -51,19 +51,45 @@ export interface PlanViewProps {
 
 export default function PlanView(props: PlanViewProps) {
     const mapRef = useRef<HTMLDivElement>(null);
-    const [mapsLoaded, setmapsLoaded] = useState(false);
+    const [mapsLoaded, setMapsLoaded] = useState(false);
     const [mapCtrl, setMapCtrl] = useState<Microsoft.Maps.Map|null>(null);
+    const [geoLocation, setGeoLocation] = useState<Position|null>(null);
+    
+    useEffect(()=>{
+        props.rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
+            (pos)=>{
+                setGeoLocation(pos);
+            },
+            (reason)=>{
+                setGeoLocation({
+                    coords:{
+                        accuracy:0,
+                        altitude:null,
+                        altitudeAccuracy:null,
+                        heading:null,
+                        latitude:0,
+                        longitude:0,
+                        speed:null
+                    },
+                    timestamp:0
+                });
+            })
+        },[]);
     useEffect(() => {
         if (!mapsLoaded){
             props.rootState.getServices().bingMapsService.loadMapControlAsync().then(() => {
-                setmapsLoaded(true);
+                setMapsLoaded(true);
             });
         }
         if (mapsLoaded && mapRef.current){
+            var center=(geoLocation && geoLocation.coords.latitude)
+                ? new Microsoft.Maps.Location(geoLocation.coords.latitude, geoLocation.coords.longitude)
+                : undefined;
             const map = new Microsoft.Maps.Map(mapRef.current, {
+                center: center,
                 showScalebar:true,
                 mapTypeId: Microsoft.Maps.MapTypeId.aerial,
-                zoom: 10
+                zoom: 14
             });
             setMapCtrl(map);
         }

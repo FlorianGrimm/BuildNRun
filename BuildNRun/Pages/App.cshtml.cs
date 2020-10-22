@@ -23,7 +23,6 @@ namespace BuildNRun.Pages {
         //}
         public void OnGet() {
             //this.UserIsAuthenticated = this._CurrentUserService.UserIsAuthenticated();
-            this.BingMapUrl = "";
         }
     }
 }
