@@ -1,0 +1,13 @@
+﻿@page
+@model BuildNRun.Pages.AppOfflineModel
+<div id="root">loading...</div>
+@section Scripts {
+    <script type='text/javascript'>
+        window.bingMapUrl = "@(this.Model.BingMapUrl)";
+    </script>
+    <script type='text/javascript' src="~/vendor.bundle.js"></script>
+    <script type='text/javascript' src="~/app.js"></script>
+    <!--
+        <script type='text/javascript' src="~/service-worker.js"></script>
+    -->
+}

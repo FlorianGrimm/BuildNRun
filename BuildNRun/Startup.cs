@@ -1,5 +1,7 @@
 using BuildNRun.Service;
 
+using BuildNRunLibrary.Services;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -22,10 +24,11 @@ using System.Threading.Tasks;
 
 namespace BuildNRun {
     public class Startup {
-        private bool onAzure;
+        private bool _OnAzure;
+        private IConfiguration _Configuration;
 
         public Startup(IConfiguration configuration) {
-            Configuration = configuration;
+            this._Configuration = configuration;
             bool onAzure = false;
             string userdomain = System.Environment.GetEnvironmentVariable("USERDOMAIN") ?? string.Empty;
             if (string.Equals(userdomain, "WORKGROUP", StringComparison.Ordinal)) {
@@ -35,14 +38,15 @@ namespace BuildNRun {
                     onAzure = true;
                 }
             }
-            this.onAzure = onAzure;
+            this._OnAzure = onAzure;
         }
 
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
-
+            services.AddOptions<BingMapOptions>().Configure(options => { this._Configuration.Bind(options); });
+            services.AddOptions<TableStorageOptions>().Configure(options => { this._Configuration.Bind(options); });
+            services.AddSingleton<ITableStorageService, TableStorageService>();
             /*
             services.AddHttpContextAccessor();
             services.AddScoped<CurrentUserService>();
@@ -64,9 +68,9 @@ namespace BuildNRun {
                 //    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             });
 
-            if (this.onAzure) {
+            if (this._OnAzure) {
                 services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"));
+                    .AddMicrosoftIdentityWebApp(_Configuration.GetSection("AzureAd"));
             } else {
                 services.AddAuthentication("Test")
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });
@@ -76,15 +80,14 @@ namespace BuildNRun {
                 // By default, all incoming requests will be authorized according to the default policy
                 options.FallbackPolicy = options.DefaultPolicy;
             });
+            services.AddMvcCore().AddApiExplorer();
             services.AddRazorPages(options => {
-                    options.Conventions.AddPageRoute("/App", "/App/{**args}");
-                    options.Conventions.AddPageRoute("/Manifest", "/manifest.webmanifest");
-                })
-                .AddMvcOptions(options => { 
-                })
-                .AddMicrosoftIdentityUI()
+                options.Conventions.AddPageRoute("/App", "/App/{**args}");
+                options.Conventions.AddPageRoute("/AppOffline", "/AppOffline/{**args}");
+                options.Conventions.AddPageRoute("/Manifest", "/manifest.webmanifest");
+            })
+                //.AddMicrosoftIdentityUI()
                 ;
-            services.AddApiExplorerServices();
             services.AddSwaggerDocument();
         }
 

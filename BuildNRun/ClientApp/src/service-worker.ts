@@ -3,16 +3,17 @@ class ServiceWorkerApp {
     public static run(): void {
         addEventListener('install', ServiceWorkerApp.onInstalled);
         addEventListener('fetch', ServiceWorkerApp.onFetched);
+        addEventListener('activate', ServiceWorkerApp.onActivate);
     }
 
     public static onInstalled = (event: any): void => {
         event.waitUntil(
             caches.open('v0.1').then((cache) => {
                 return cache.addAll([
-
-                    '/js/app.bundle.js',
-                    '/js/serviceworker.bundle.js',
-                    '/js/vendor.bundle.js',
+                    '/AppOffline',
+                    '/app.bundle.js',
+                    '/serviceworker.bundle.js',
+                    '/vendor.bundle.js',
                     '/css/site.css'
                     /*
                     '/assets/images/logo.png',
@@ -40,6 +41,9 @@ class ServiceWorkerApp {
                 });
             })
         );
+    }
+    public static onActivate = (evt: Event):void => {
+        console.log("onActivate");
     }
 }
 

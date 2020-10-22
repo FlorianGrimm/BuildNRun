@@ -29,13 +29,13 @@
         "type": "image/png"
     }],
     "scope": "@(this.Model.SchemeHost)/",
-    "start_url": "@(this.Model.SchemeHost)/App",
+    "start_url": "@(this.Model.SchemeHost)/AppOffline",
     "display": "standalone",
     "theme_color": "#000000",
     "background_color": "#ffffff",
     "serviceworker": {
-        "src": "@(this.Model.SchemeHost)/js/service-worker.js",
-        "scope": "/app",
+        "src": "@(this.Model.SchemeHost)/service-worker.js",
+        "scope": "@(this.Model.SchemeHost)/",
         "type": "",
         "update_via_cache": "none"
     }

@@ -1,7 +1,17 @@
 const path = require('path');
+const webpack = require('webpack');
 
-module.exports = {
-    mode: "development",
+const mode = process.env.NODE_ENV || "development"
+
+/*
+const fileDep = path.resolve(__dirname, 'sample.txt');
+new webpack.DefinePlugin({
+  BUILT_AT: webpack.DefinePlugin.runtimeValue(Date.now, [fileDep])
+});
+*/
+
+const config = {
+    mode: mode,
     /*
     entry: './src/index.tsx',
     */
@@ -33,7 +43,7 @@ module.exports = {
     },
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, '../wwwroot/js'),
+        path: path.resolve(__dirname, '../wwwroot'),
         //chunkLoading: 'importScripts'
         //chunkFormat: 'commonjs'
         chunkFormat: 'array-push'
@@ -50,7 +60,12 @@ module.exports = {
                 }
             }
         }
-    },
+    },    
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(mode),
+            /* 'process.env.BUILD_VERSION': JSON.stringify(pkg.version) */
+        })
     ]
 };
+module.exports = config

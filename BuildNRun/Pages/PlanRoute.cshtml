@@ -7,9 +7,14 @@
     @{
         <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AmyGeNkzX6tFlGE0bwaRsfrwARVEuyxO_ny8FMWnwgdIVuYN0wSdPmEpzLycbEwk'></script>
         <script type='text/javascript'>
+
             var map;
             function loadMapScenario() {
-                map = new Microsoft.Maps.Map(document.getElementById('root'), {});
+                const eleRoot = document.getElementById('root');
+                map = new Microsoft.Maps.Map(eleRoot, {
+                    mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+                    zoom: 10
+                });
             }
         </script>
     }
@@ -23,11 +28,12 @@
 
 @section Scripts {
     <script type='text/javascript'>
-        loadMapScenario();
+        window.addEventListener('load', () => {
+            loadMapScenario();
+        });
     </script>
     <!--
-
-        <script type='text/javascript' src='/js/bundle.js'></script>
+        <script type='text/javascript' src="~/vendor.bundle.js"></script>
+        <script type='text/javascript' src="~/app.js"></script>
     -->
 }
-

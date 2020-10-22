@@ -55,3 +55,30 @@
         top: 30px;
         bottom: 0;
     }
+
+    div.page,
+    div.root {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: calc(100vh - 30px);
+    }
+    div.pageSection,
+    div.pageSectionTop,
+    div.pageSectionContent,
+    div.pageSectionButton{
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+    }
+    div.pageSectionTop{
+        height: 100px;
+    }
+
+    div.pageSectionContent{
+        height: calc(100vh - 230px);
+    }
+
+    div.pageSectionButton{
+        height: 100px;
+    }
