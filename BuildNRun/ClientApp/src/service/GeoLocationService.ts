@@ -36,6 +36,20 @@ export default class GeoLocationService {
             });
         }
     }
+    static getPosition00():Position{
+        return {
+            coords:{
+                accuracy:0,
+                altitude:null,
+                altitudeAccuracy:null,
+                heading:null,
+                latitude:0,
+                longitude:0,
+                speed:null
+            },
+            timestamp:0
+        };
+    }
  
     watchPosition(successCallback: PositionCallback, errorCallback?: PositionErrorCallback, options?: PositionOptions) {
         this.currentSuccessCallback = successCallback || null;

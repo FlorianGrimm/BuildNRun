@@ -13,9 +13,13 @@ namespace BuildNRun.Pages {
     // [Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute()]
     public class AppModel : PageModel {
         public string BingMapUrl { get; set; }
+        public string BingMapCredentials { get; set; }
+        
         public AppModel(IOptions<BingMapOptions> options) {
             this.BingMapUrl = options.Value.BingMapUrl;
+            this.BingMapCredentials = options.Value.BingMapCredentials;
         }
+
         //public bool UserIsAuthenticated;
         //private readonly CurrentUserService _CurrentUserService;
         //public AppModel(CurrentUserService currentUserService) {

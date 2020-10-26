@@ -12,9 +12,13 @@ namespace BuildNRun.Pages
     public class AppOfflineModel : PageModel
     {
         public string BingMapUrl { get; set; }
+        public string BingMapCredentials { get; set; }
+
         public AppOfflineModel(IOptions<BingMapOptions> options) {
             this.BingMapUrl = options.Value.BingMapUrl;
+            this.BingMapCredentials = options.Value.BingMapCredentials;
         }
+
         public void OnGet()
         {
         }

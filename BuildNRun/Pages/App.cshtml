@@ -27,33 +27,17 @@
         if (showBanner) {
             <!--  -->
         } else {
-            <script type ='text/javascript'>
-                window.bingMapUrl = "@(this.Model.BingMapUrl)";
+            <script type='text/javascript'>
+                function getBuildNRunConfig() {
+                    return {
+                        bingMapUrl: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(this.Model.BingMapUrl)),
+                        bingMapCredentials: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(this.Model.BingMapCredentials))
+                    };
+                }
             </script>
+            <script type='text/javascript' src="@(this.Model.BingMapUrl)" defer async></script>
             <script type='text/javascript' src="~/vendor.bundle.js"></script>
             <script type='text/javascript' src="~/app.js"></script>
-                <!--
-                    <script type='text/javascript' src="~/service-worker.js"></script>
-                -->
-            }
+        }
     }
 }
-
-<!--
-
-    <script type='text/javascript' src="~/app.js" asp-append-version="true"></script>
-    <script type='text/javascript' src='/app.bundle.js'></script>
-<div id='printoutPanel'></div>
-<script type='text/javascript'>
-    var map;
-    function loadMapScenario() {
-        map = new Microsoft.Maps.Map(document.getElementById('myMap'), {});
-    }
-</script>
-
-<div id='myMap' style='width: 100vw; height: 100vh;'></div>
-
-<script type='text/javascript'>
-    loadMapScenario();
-</script>
--->

@@ -4,10 +4,12 @@ import registerSW from './registerServiceWorker';
 import App from './App';
 import RootState from './RootState';
 import Services from './service'
-const bingMapUrl = ((window as any).bingMapUrl as string) ?? "";
+import { getAppRootConfig, AppRootConfig } from './AppRootConfig';
+
+const appRootConfig : (AppRootConfig|null) = getAppRootConfig();
 const rootElement = document.getElementById('root');
-if (rootElement) {
-    const services = new Services(bingMapUrl);
+if (rootElement && appRootConfig) {
+    const services = new Services(appRootConfig);
     const rootState = new RootState(services);
     const appRootPath = window.location.pathname.toLowerCase().startsWith("/appoffline") ? "/AppOffline" : "/App";
     ReactDOM.render(
@@ -16,4 +18,7 @@ if (rootElement) {
         ),
         rootElement);
     if (window === undefined) registerSW();
+} else {
+    if (!rootElement) {console.error("rootElement is null.");}
+    if (!appRootConfig) {console.error("appRootConfig is null.");}
 }
