@@ -19,7 +19,7 @@ export interface PlanViewProps {
 type InitialState = {
     mapCtrlLoaded: boolean;
     mapRoute: MapRoute | null;
-    geoLocation: Position;
+    geoLocation: GeolocationPosition;
 };
 function getInitialState(): InitialState {
     return {
@@ -82,7 +82,7 @@ function handleActionAsync(
     }
     if (action.type === "getCurrentPosition"){
         rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
-            (geoLocation: Position) => {
+            (geoLocation: GeolocationPosition) => {
                 console.log("setGeoLocation", geoLocation);
                 dispatch({ type: "setGeoLocation", geoLocation: geoLocation.coords });
             },
@@ -106,7 +106,7 @@ export default function PlanView(props: PlanViewProps) {
         () => ({ rootState: props.rootState, dispatch: dispatch }),
         () => [{type:"loadMapControl"}, {type:"getCurrentPosition"}]
         );
-
+/*
     useEffect(
         () => {
             if (mapRef.current && state.mapCtrlLoaded) {
@@ -144,7 +144,7 @@ export default function PlanView(props: PlanViewProps) {
         },
         [mapRef.current, state.mapCtrlLoaded]
     );
-
+*/
 
 
     /*

@@ -1,4 +1,4 @@
-export type GeoCoordinates {
+export type GeoCoordinates = {
     accuracy?: number | null | undefined;
     // altitude: number | null;
     // altitudeAccuracy: number | null;
@@ -9,8 +9,8 @@ export type GeoCoordinates {
     state?: number | null | undefined;
 }
 
-export type GeoPosition {
-    coords: Coordinates;
+export type GeoPosition = {
+    coords: GeolocationCoordinates;
     timestamp: number;
 }
 

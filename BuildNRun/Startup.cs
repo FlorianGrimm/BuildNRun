@@ -32,7 +32,6 @@ namespace BuildNRun {
             bool onAzure = false;
             string userdomain = System.Environment.GetEnvironmentVariable("USERDOMAIN") ?? string.Empty;
             if (string.Equals(userdomain, "WORKGROUP", StringComparison.Ordinal)) {
-                // COMPUTERNAME=RD501AC552AFB6
                 var computername = System.Environment.GetEnvironmentVariable("COMPUTERNAME") ?? string.Empty;
                 if (computername.StartsWith("RD")) {
                     onAzure = true;
@@ -41,8 +40,6 @@ namespace BuildNRun {
             this._OnAzure = onAzure;
         }
 
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddOptions<BingMapOptions>().Configure(options => { this._Configuration.Bind(options); });
             services.AddOptions<TableStorageOptions>().Configure(options => { this._Configuration.Bind(options); });

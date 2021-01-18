@@ -16,6 +16,9 @@ export default function HomeView(props: HomeViewProps) {
             </div>
             <div className="pageSectionContent">
                 Spiel
+                <img src="/img/Baumhaus-1.png" />
+                <img src="/img/Zelt-1.png" />
+                <img src="/img/Berg-1.png" />
             </div>
             <div className="pageSectionButton">
                 <Link to="/">Play</Link> | <Link to="/plan">Plan</Link> | <Link to="/run">Run</Link>

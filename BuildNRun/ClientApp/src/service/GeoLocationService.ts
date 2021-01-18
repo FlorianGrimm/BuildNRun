@@ -3,7 +3,7 @@ var positionWatcher = 0;
 export default class GeoLocationService {
     currentSuccessCallback: PositionCallback | null;
     currentErrorCallback: PositionErrorCallback | null;
-    currentPosition: Position | null;
+    currentPosition: GeolocationPosition | null;
 
     constructor() {
         this.currentSuccessCallback = null;
@@ -11,20 +11,20 @@ export default class GeoLocationService {
         this.currentPosition = null;
     }
 
-    private watchPositionSuccessCallback = (position: Position) => {
+    private watchPositionSuccessCallback = (position: GeolocationPosition) => {
         this.currentPosition = position;
         if (this.currentSuccessCallback !== null) {
             this.currentSuccessCallback(position);
         }
     };
 
-    private watchPositionErrorCallback = (positionError: PositionError) => {
+    private watchPositionErrorCallback = (positionError: GeolocationPositionError) => {
         if (this.currentErrorCallback !== null) {
             this.currentErrorCallback(positionError);
         }
     };
 
-    getCurrentPositionAsync(): Promise<Position> {
+    getCurrentPositionAsync(): Promise<GeolocationPosition> {
         if (navigator.geolocation) {
             return new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject, { maximumAge: 1000 * 60, timeout: 1000 * 60 * 2 });
@@ -36,7 +36,7 @@ export default class GeoLocationService {
             });
         }
     }
-    static getPosition00():Position{
+    static getPosition00():GeolocationPosition{
         return {
             coords:{
                 accuracy:0,
