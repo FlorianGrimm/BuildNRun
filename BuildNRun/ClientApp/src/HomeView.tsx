@@ -22,7 +22,7 @@ export default function HomeView(props: HomeViewProps) {
                                 <td>
                                     <img width="100px" src="/img/coin.png" />
                                     <br />
-                                    100
+                                    200
                                 </td>
                                 <td>
 
@@ -38,9 +38,9 @@ export default function HomeView(props: HomeViewProps) {
                     </table>
                 </div>
                 <div style={{ paddingLeft: 10 }}>
-                    <img width="30%" src="/img/Baumhaus-1.png" />
-                    <img width="30%" src="/img/Zelt-1.png" />
-                    <img width="30%" src="/img/Berg-1.png" />
+                    <img width="200px" src="/img/Baumhaus-1.png" />
+                    <img width="200px" src="/img/Zelt-1.png" />
+                    <img width="200px" src="/img/Berg-1.png" />
                 </div>
             </div>
             <div className="pageSectionButton">
