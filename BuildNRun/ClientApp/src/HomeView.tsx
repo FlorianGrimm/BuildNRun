@@ -15,16 +15,37 @@ export default function HomeView(props: HomeViewProps) {
                 HomeView
             </div>
             <div className="pageSectionContent">
-                Spiel
-                <img src="/img/Aktion.png" />
-                <img src="/img/Waage.png" />
-                <img src="/img/Baumhaus-1.png" />
-                <img src="/img/Zelt-1.png" />
-                <img src="/img/Berg-1.png" />
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <img width="100px" src="/img/coin.png" />
+                                    <br />
+                                    100
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <img width="200px" src="/img/Aktion.png" />
+                                </td>
+                                <td>
+                                    <img width="200px" src="/img/Waage.png" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style={{ paddingLeft: 10 }}>
+                    <img width="30%" src="/img/Baumhaus-1.png" />
+                    <img width="30%" src="/img/Zelt-1.png" />
+                    <img width="30%" src="/img/Berg-1.png" />
+                </div>
             </div>
             <div className="pageSectionButton">
                 <Link to="/">Play</Link> | <Link to="/plan">Plan</Link> | <Link to="/run">Run</Link>
             </div>
         </div>
-    );    
+    );
 }
