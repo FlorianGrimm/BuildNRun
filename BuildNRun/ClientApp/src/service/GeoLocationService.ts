@@ -1,9 +1,11 @@
+import { GeoPosition, GeoCoordinates, GeoPositionError } from "../types";
+
 var positionWatcher = 0;
 
 export default class GeoLocationService {
     currentSuccessCallback: PositionCallback | null;
     currentErrorCallback: PositionErrorCallback | null;
-    currentPosition: GeolocationPosition | null;
+    currentPosition: GeoPosition | null;
 
     constructor() {
         this.currentSuccessCallback = null;
@@ -11,20 +13,20 @@ export default class GeoLocationService {
         this.currentPosition = null;
     }
 
-    private watchPositionSuccessCallback = (position: GeolocationPosition) => {
+    private watchPositionSuccessCallback = (position: GeoPosition) => {
         this.currentPosition = position;
         if (this.currentSuccessCallback !== null) {
-            this.currentSuccessCallback(position);
+            this.currentSuccessCallback(position as any);
         }
     };
 
-    private watchPositionErrorCallback = (positionError: GeolocationPositionError) => {
+    private watchPositionErrorCallback = (positionError: GeoPositionError) => {
         if (this.currentErrorCallback !== null) {
             this.currentErrorCallback(positionError);
         }
     };
 
-    getCurrentPositionAsync(): Promise<GeolocationPosition> {
+    getCurrentPositionAsync(): Promise<GeoPosition> {
         if (navigator.geolocation) {
             return new Promise((resolve, reject) => {
                 navigator.geolocation.getCurrentPosition(resolve, reject, { maximumAge: 1000 * 60, timeout: 1000 * 60 * 2 });
@@ -36,13 +38,13 @@ export default class GeoLocationService {
             });
         }
     }
-    static getPosition00():GeolocationPosition{
+    static getPosition00():GeoPosition{
         return {
             coords:{
                 accuracy:0,
-                altitude:null,
-                altitudeAccuracy:null,
-                heading:null,
+                // altitude:null,
+                // altitudeAccuracy:null,
+                // heading:null,
                 latitude:0,
                 longitude:0,
                 speed:null
