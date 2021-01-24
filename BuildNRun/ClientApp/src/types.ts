@@ -1,8 +1,8 @@
 export type GeoCoordinates = {
     accuracy?: number | null | undefined;
-    // altitude: number | null;
-    // altitudeAccuracy: number | null;
-    // heading: number | null;
+    //  altitude?: number | null;
+    //  altitudeAccuracy?: number | null;
+    //  heading?: number | null;
     latitude: number;
     longitude: number;
     speed?: number | null | undefined;
@@ -10,9 +10,18 @@ export type GeoCoordinates = {
 }
 
 export type GeoPosition = {
-    coords: GeolocationCoordinates;
+    coords: GeoCoordinates;
     timestamp: number;
 }
+
+export interface GeoPositionError {
+    readonly code: number;
+    readonly message: string;
+    readonly PERMISSION_DENIED: number;
+    readonly POSITION_UNAVAILABLE: number;
+    readonly TIMEOUT: number;
+}
+
 
 export type House = {
     timestamp: number;

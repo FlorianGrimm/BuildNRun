@@ -19,7 +19,7 @@ export interface PlanViewProps {
 type InitialState = {
     mapCtrlLoaded: boolean;
     mapRoute: MapRoute | null;
-    geoLocation: GeolocationPosition;
+    geoLocation: GeoPosition;
 };
 function getInitialState(): InitialState {
     return {
@@ -82,7 +82,7 @@ function handleActionAsync(
     }
     if (action.type === "getCurrentPosition"){
         rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
-            (geoLocation: GeolocationPosition) => {
+            (geoLocation) => {
                 console.log("setGeoLocation", geoLocation);
                 dispatch({ type: "setGeoLocation", geoLocation: geoLocation.coords });
             },
