@@ -30,24 +30,16 @@ export default class App extends Component<AppProps, AppState> {
     }
 
     render() {
-        /*
-                      <ul>
-                        <li>
-                            <Link to="/">Play</Link>
-                        </li>
-                        <li>
-                            <Link to="/plan">Plan</Link>
-                        </li>
-                        <li>
-                            <Link to="/run">Run</Link>
-                        </li>
-                    </ul>
-      
-        */
         return (
             <Router basename={this.props.appRootPath}>
                 <Switch>
                     <Route exact path="/">
+                        <HomeView rootState={this.props.rootState} />
+                    </Route>
+                    <Route path="/aktion">
+                        <HomeView rootState={this.props.rootState} />
+                    </Route>
+                    <Route path="/abstimmung">
                         <HomeView rootState={this.props.rootState} />
                     </Route>
                     <Route path="/plan">

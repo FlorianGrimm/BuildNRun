@@ -5,5 +5,6 @@ using System.Text;
 namespace BuildNRunLibrary.Model {
     //
     public class HouseModel {
+        public float Level { get; set; }
     }
 }

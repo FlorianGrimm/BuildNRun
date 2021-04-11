@@ -86,6 +86,10 @@ namespace BuildNRun {
                 //.AddMicrosoftIdentityUI()
                 ;
             services.AddSwaggerDocument();
+            services.AddOptions<SimplePersistenceOptions>().Configure(cfg=> {
+                cfg.DataPath = this._Configuration.GetValue<string>("DataPath");
+            });
+            services.AddSingleton<ISimplePersistence, SimplePersistence>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

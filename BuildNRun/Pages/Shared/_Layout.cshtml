@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="/favicon.ico">
     @RenderSection("head", required: false)
 </head>
-<body>
+<body style="background-image: url('/img/Hintergrund.png'); background-size: cover;">
     <div id="header">
         @{ 
             var (showBanner, consentCookie, userName) = BuildNRun.Service.CookieConsentService.GetCookieShowBanner(this.Context);

@@ -60,8 +60,8 @@ function reducer(state: State, action: Action): State {
 
 type ActionAsync =
     { type: "viewchange", mapRoute: MapRoute }
-    | { type: "loadMapControl"}
-    | { type: "getCurrentPosition"}
+    | { type: "loadMapControl" }
+    | { type: "getCurrentPosition" }
     ;
 
 function handleActionAsync(
@@ -71,16 +71,16 @@ function handleActionAsync(
     if (action.type === "viewchange") {
         //
         const location = action.mapRoute.map.getCenter();
-        dispatch({type:"setGeoLocation", geoLocation:location})
+        dispatch({ type: "setGeoLocation", geoLocation: location })
         //
         return;
     }
-    if (action.type === "loadMapControl"){
+    if (action.type === "loadMapControl") {
         return rootState.getServices().bingMapsService.loadMapControlAsync(true).then(() => {
             dispatch({ type: "mapCtrlLoaded" })
         });
     }
-    if (action.type === "getCurrentPosition"){
+    if (action.type === "getCurrentPosition") {
         rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
             (geoLocation) => {
                 console.log("setGeoLocation", geoLocation);
@@ -104,47 +104,82 @@ export default function PlanView(props: PlanViewProps) {
     const [isProcessing, pushAction] = useReduceAsync<ActionAsync>(
         handleActionAsync,
         () => ({ rootState: props.rootState, dispatch: dispatch }),
-        () => [{type:"loadMapControl"}, {type:"getCurrentPosition"}]
-        );
-/*
+        () => [{ type: "loadMapControl" }, { type: "getCurrentPosition" }]
+    );
+
     useEffect(
         () => {
-            if (mapRef.current && state.mapCtrlLoaded) {
-                // if (state.mapRoute) {
-                //     return () => {
-                //         state.mapRoute?.dispose();
-                //     };
-                // } else {
+            if (mapRef.current) {
+                if (state.mapRoute) {
+                    //OK
+                } else {
+                    const bingMapsService = props.rootState.getServices().bingMapsService;
+                    const mapConfig = bingMapsService.getMapConfig();
+                    const coords = state.geoLocation;
+                    if (coords && coords.latitude && coords.longitude && Microsoft && Microsoft.Maps && Microsoft.Maps.Location) {
+                        var center = new Microsoft.Maps.Location(coords.latitude, coords.longitude);
+                        mapConfig.center = center
+                    }
+                    mapConfig.showScalebar = true;
+                    mapConfig.showLocateMeButton = true;
+                    mapConfig.mapTypeId = Microsoft.Maps.MapTypeId.aerial;
+                    mapConfig.zoom = 14
 
-                const bingMapsService = props.rootState.getServices().bingMapsService;
-                const mapConfig = bingMapsService.getMapConfig();
-                const coords = state.geoLocation;
-                if (coords && coords.latitude && coords.longitude) {
-                    var center = new Microsoft.Maps.Location(coords.latitude, coords.longitude);
-                    mapConfig.center = center
+                    console.log("new Microsoft.Maps.Map");
+                    const mapRoute = bingMapsService.createMap(mapRef.current, mapConfig);
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangestart', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchange', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangeend', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+debugger;
+                    dispatch({ type: "mapRoute", mapRoute: mapRoute });
+                    return () => {
+                        mapRoute.dispose();
+                    };
                 }
-                mapConfig.showScalebar = true;
-                mapConfig.showLocateMeButton = true;
-                mapConfig.mapTypeId = Microsoft.Maps.MapTypeId.aerial;
-                mapConfig.zoom = 14
-
-                console.log("new Microsoft.Maps.Map");
-                const mapRoute = bingMapsService.createMap(mapRef.current, mapConfig);
-                Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangestart', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchange', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangeend', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-
-                dispatch({ type: "mapRoute", mapRoute: mapRoute });
-                return () => {
-                    mapRoute.dispose();
-                };
-                // }
             }
         },
         [mapRef.current, state.mapCtrlLoaded]
     );
-*/
+    /*
+        useEffect(
+            () => {
+                if (mapRef.current && state.mapCtrlLoaded) {
+                    // if (state.mapRoute) {
+                    //     return () => {
+                    //         state.mapRoute?.dispose();
+                    //     };
+                    // } else {
+    
+                    const bingMapsService = props.rootState.getServices().bingMapsService;
+                    const mapConfig = bingMapsService.getMapConfig();
+                    const coords = state.geoLocation;
+                    if (coords && coords.latitude && coords.longitude) {
+                        var center = new Microsoft.Maps.Location(coords.latitude, coords.longitude);
+                        mapConfig.center = center
+                    }
+                    mapConfig.showScalebar = true;
+                    mapConfig.showLocateMeButton = true;
+                    mapConfig.mapTypeId = Microsoft.Maps.MapTypeId.aerial;
+                    mapConfig.zoom = 14
+    
+                    console.log("new Microsoft.Maps.Map");
+                    const mapRoute = bingMapsService.createMap(mapRef.current, mapConfig);
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangestart', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchange', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangeend', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+    
+                    dispatch({ type: "mapRoute", mapRoute: mapRoute });
+                    return () => {
+                        mapRoute.dispose();
+                    };
+                    // }
+                }
+            },
+            [mapRef.current, state.mapCtrlLoaded]
+        );
+    */
 
 
     /*

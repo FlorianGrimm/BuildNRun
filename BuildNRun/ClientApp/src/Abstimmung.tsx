@@ -4,24 +4,24 @@ import {
     Link
 } from "react-router-dom";
 
-export interface HomeViewProps {
+export interface AbstimmungViewProps {
     rootState: RootState;
 }
 
-export default function HomeView(props: HomeViewProps) {
+export default function AbstimmungView(props: AbstimmungViewProps) {
     const uiState = props.rootState.getGlobalState().uiState;
     return (
         <div className="page">
             <div className="pageSectionTop">
-                HomeView
+            AbstimmungView
             </div>
             <div className="pageSectionContent">
                 <table style={{maxWidth:600, textAlign:"center"}}>
                     <tbody>
                         <tr>
                             <td><Link to="/plan">Laufen</Link></td>
-                            <td><Link to="/aktion">Aktion</Link></td>
-                            <td><Link to="/abstimmung">Abstimmung</Link></td>
+                            <td><Link to="/run">Aktion</Link></td>
+                            <td><Link to="/run">Abstimmung</Link></td>
                         </tr>
                         <tr>
                             <td>
