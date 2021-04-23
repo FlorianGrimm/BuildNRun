@@ -1,7 +1,5 @@
 using BuildNRun.Service;
 
-using BuildNRunLibrary.Services;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,18 +30,19 @@ namespace BuildNRun {
             bool onAzure = false;
             string userdomain = System.Environment.GetEnvironmentVariable("USERDOMAIN") ?? string.Empty;
             if (string.Equals(userdomain, "WORKGROUP", StringComparison.Ordinal)) {
-                var computername = System.Environment.GetEnvironmentVariable("COMPUTERNAME") ?? string.Empty;
-                if (computername.StartsWith("RD")) {
-                    onAzure = true;
-                }
+                //var computername = System.Environment.GetEnvironmentVariable("COMPUTERNAME") ?? string.Empty;
+                //if (computername.StartsWith("RD")) {
+                //    onAzure = true;
+                //}
+                onAzure = true;
             }
             this._OnAzure = onAzure;
         }
 
         public void ConfigureServices(IServiceCollection services) {
             services.AddOptions<BingMapOptions>().Configure(options => { this._Configuration.Bind(options); });
-            services.AddOptions<TableStorageOptions>().Configure(options => { this._Configuration.Bind(options); });
-            services.AddSingleton<ITableStorageService, TableStorageService>();
+            //services.AddOptions<TableStorageOptions>().Configure(options => { this._Configuration.Bind(options); });
+            //services.AddSingleton<ITableStorageService, TableStorageService>();
             /*
             services.AddHttpContextAccessor();
             services.AddScoped<CurrentUserService>();
@@ -55,7 +54,6 @@ namespace BuildNRun {
             //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             //    options.Cookie.IsEssential = true;
             //});
-
             services.Configure<CookiePolicyOptions>(options => {
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
@@ -85,11 +83,22 @@ namespace BuildNRun {
             })
                 //.AddMicrosoftIdentityUI()
                 ;
-            services.AddSwaggerDocument();
-            services.AddOptions<SimplePersistenceOptions>().Configure(cfg=> {
-                cfg.DataPath = this._Configuration.GetValue<string>("DataPath");
-            });
-            services.AddSingleton<ISimplePersistence, SimplePersistence>();
+
+            // services.AddSwaggerDocument();
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc(
+                    "v1", 
+                    new OpenApiInfo { 
+                        Title = "BuildNRun", 
+                        Version = "v1" });
+            });            
+
+            services.AddSwaggerGenNewtonsoftSupport();
+
+            //services.AddOptions<SimplePersistenceOptions>().Configure(cfg=> {
+            //    cfg.DataPath = this._Configuration.GetValue<string>("DataPath");
+            //});
+            //services.AddSingleton<ISimplePersistence, SimplePersistence>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -115,9 +124,11 @@ namespace BuildNRun {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
-
-            app.UseOpenApi();
-            app.UseSwaggerUi3();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BuildNRun V1");
+            });            
+            //app.UseSwaggerUi3();
         }
     }
 }

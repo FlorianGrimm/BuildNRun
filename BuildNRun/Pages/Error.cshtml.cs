@@ -20,7 +20,8 @@ namespace BuildNRun.Pages {
 
         public ErrorModel(ILogger<ErrorModel> logger)
         {
-            _logger = logger;
+            this._logger = logger;
+            this.RequestId = string.Empty;
         }
 
         public void OnGet()

@@ -17,6 +17,10 @@ if (rootElement && appRootConfig) {
             <App rootState={rootState} appRootPath={appRootPath}></App>
         ),
         rootElement);
+    services.client.build().then((userModel)=>{
+        rootState.getGlobalState().setUserModel(userModel)
+        //rootState.getGlobalState().uiState.baumhaus = userModel;
+    });
     if (window === undefined) registerSW();
 } else {
     if (!rootElement) {console.error("rootElement is null.");}

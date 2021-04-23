@@ -13,7 +13,7 @@ export default function HomeView(props: HomeViewProps) {
     return (
         <div className="page">
             <div className="pageSectionTop">
-                HomeView
+                Home
             </div>
             <div className="pageSectionContent">
                 <table style={{maxWidth:600, textAlign:"center"}}>

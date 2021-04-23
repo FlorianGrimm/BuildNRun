@@ -71,19 +71,21 @@ function handleActionAsync(
     if (action.type === "viewchange") {
         //
         const location = action.mapRoute.map.getCenter();
+        console.log("dispatch.setGeoLocation");
         dispatch({ type: "setGeoLocation", geoLocation: location })
         //
         return;
     }
     if (action.type === "loadMapControl") {
         return rootState.getServices().bingMapsService.loadMapControlAsync(true).then(() => {
+            console.log("dispatch.loadMapControl");
             dispatch({ type: "mapCtrlLoaded" })
         });
     }
     if (action.type === "getCurrentPosition") {
         rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
             (geoLocation) => {
-                console.log("setGeoLocation", geoLocation);
+                console.log("dispatch.setGeoLocation", geoLocation);
                 dispatch({ type: "setGeoLocation", geoLocation: geoLocation.coords });
             },
             (reason) => {
@@ -95,18 +97,99 @@ function handleActionAsync(
 }
 
 export default function PlanView(props: PlanViewProps) {
-    const mapRef = useRef<HTMLDivElement>(null);
-    const [state, dispatch] = useReducer(reducer, {
-        mapCtrlLoaded: false,
-        mapRoute: null,
-        geoLocation: null
-    });
-    const [isProcessing, pushAction] = useReduceAsync<ActionAsync>(
-        handleActionAsync,
-        () => ({ rootState: props.rootState, dispatch: dispatch }),
-        () => [{ type: "loadMapControl" }, { type: "getCurrentPosition" }]
-    );
+    const isMountedRef = useRef<number>(0);
 
+    const mapRef = useRef<HTMLDivElement>(null);
+    const [mapRouteState, setMapRoute] = useState<MapRoute>();
+    //const [mapCtrlLoaded,setMapCtrlLoaded] = useState<boolean>();
+    const [geoLocation, setGeoLocation] = useState<GeoCoordinates>();
+
+    useEffect(() => {
+        if (isMountedRef.current === 0) {
+            isMountedRef.current = 1;
+        }
+        return () => {
+            if (mapRef.current) {
+            } else {
+                console.log("unload");
+                isMountedRef.current = -1;
+            }
+        };
+    }, [mapRef.current !== null]);
+
+    useEffect(() => {
+        if (mapRef.current !== null && isMountedRef.current > 0) {
+            if (geoLocation === undefined) {
+                debugger;
+                props.rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
+                    (geoLocation) => {
+                        if (isMountedRef.current > 0) {
+                            console.log("setGeoLocation", geoLocation.coords);
+                            setGeoLocation(geoLocation.coords);
+                        }
+                    },
+                    (reason) => {
+                        if (isMountedRef.current > 0) {
+                            console.log("setGeoLocation", NaN);
+                            setGeoLocation({ latitude: NaN, longitude: NaN });
+                        }
+                    }
+                );
+            }
+        }
+    }, [isMountedRef.current > 0]);
+
+    // const [state, dispatch] = useReducer(reducer, {
+    //     mapCtrlLoaded: false,
+    //     mapRoute: null,
+    //     geoLocation: null
+    // });
+
+    // //Dispatch<ReducerAction<R>>
+    // const [isProcessing, pushAction] = useReduceAsync<ActionAsync>(
+    //     handleActionAsync,
+    //     () => ({
+    //         rootState: props.rootState, dispatch: (value: Action) => {
+    //             if (isMountedRef.current >= 0) {
+    //                 console.log("dispatch", value);
+    //                 dispatch(value);
+    //             }
+    //         }
+    //     }),
+    //     () => [{ type: "loadMapControl" }, { type: "getCurrentPosition" }]
+    // );
+
+    useEffect(() => {
+        if ((window as any).Microsoft) {
+            if (mapRef.current) {
+                if ((mapRouteState == undefined)) {
+                    const bingMapsService = props.rootState.getServices().bingMapsService;
+                    const mapConfig = bingMapsService.getMapConfig();
+                    if (geoLocation !== undefined) {
+                        if (geoLocation.latitude && !isNaN(geoLocation.latitude)
+                            && geoLocation.longitude && !isNaN(geoLocation.longitude)
+                            && Microsoft && Microsoft.Maps && Microsoft.Maps.Location) {
+                            var center = new Microsoft.Maps.Location(geoLocation.latitude, geoLocation.longitude);
+                            mapConfig.center = center
+                        }
+                    }
+                    mapConfig.showScalebar = true;
+                    mapConfig.showLocateMeButton = true;
+                    mapConfig.mapTypeId = Microsoft.Maps.MapTypeId.aerial;
+                    mapConfig.zoom = 14
+                    console.log("new Microsoft.Maps.Map");
+                    const mapRoute = bingMapsService.createMap(mapRef.current, mapConfig);
+                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangestart', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchange', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangeend', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+                    //dispatch({ type: "mapRoute", mapRoute: mapRoute });
+                    setMapRoute(mapRoute);
+                }
+            }
+        }
+    }, [((window as any).Microsoft) && (mapRef.current === undefined) && (mapRouteState === undefined)]);
+    /*
     useEffect(
         () => {
             if (mapRef.current) {
@@ -138,9 +221,10 @@ debugger;
                     };
                 }
             }
-        },
+        },        
         [mapRef.current, state.mapCtrlLoaded]
     );
+    */
     /*
         useEffect(
             () => {
@@ -208,7 +292,9 @@ debugger;
                 <Link to="/">Play</Link> | <Link to="/plan">Plan</Link> | <Link to="/run">Run</Link>
             </div>
             <div className="pageSectionContent" style={{ backgroundColor: "darkgray" }} ref={mapRef}>
-                Landkarte wird geladen
+                <div>
+                    Landkarte wird geladen
+                </div>
             </div>
             <div className="pageSectionButton">
             </div>

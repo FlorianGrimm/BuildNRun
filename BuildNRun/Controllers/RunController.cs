@@ -7,11 +7,10 @@ namespace BuildNRun.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class RunController : ControllerBase {
-        private readonly ISimplePersistence _SimplePersistence;
-
-        public RunController(ISimplePersistence simplePersistence) {
-            this._SimplePersistence = simplePersistence;
-        }
+        //private readonly ISimplePersistence _SimplePersistence;
+        //public RunController(ISimplePersistence simplePersistence) {
+        //    this._SimplePersistence = simplePersistence;
+        //}
 
     }
 }

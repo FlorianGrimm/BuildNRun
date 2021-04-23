@@ -1,7 +1,7 @@
 ﻿@page
 @model BuildNRun.Pages.AppModel
 @{
-    ViewData["Title"] = "App";
+    ViewData["Title"] = "BuildNRun App";
     var (showBanner, consentCookie, userName) = BuildNRun.Service.CookieConsentService.GetCookieShowBanner(this.HttpContext);
 }
 @section head {

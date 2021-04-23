@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect, useRef } from 'react';
 import RootState from './RootState';
 import {
     Link
@@ -10,57 +10,43 @@ export interface AbstimmungViewProps {
 
 export default function AbstimmungView(props: AbstimmungViewProps) {
     const uiState = props.rootState.getGlobalState().uiState;
+    const isMountedRef = useRef<number>(0); 
+    useEffect(()=>{
+        isMountedRef.current=1;
+        return ()=>{isMountedRef.current=-1;};
+    },[]);
+    const handleVote = (vote:string)=>{
+        const handle = async (vote:string)=>{
+            const x=await props.rootState.getServices().client.build();
+            console.log( x.baumhaus);
+        };
+        handle(vote);
+    };
     return (
         <div className="page">
             <div className="pageSectionTop">
-            AbstimmungView
+                Abstimmung
             </div>
             <div className="pageSectionContent">
-                <table style={{maxWidth:600, textAlign:"center"}}>
+                <table>
                     <tbody>
                         <tr>
-                            <td><Link to="/plan">Laufen</Link></td>
-                            <td><Link to="/run">Aktion</Link></td>
-                            <td><Link to="/run">Abstimmung</Link></td>
+                            <td>Aktion</td>
+                            <td>Anzahl</td>
+                            <td></td>
                         </tr>
                         <tr>
-                            <td>
-                                <div style={{position:"relative"}} >
-                                <img width="100%" src="/img/Guthaben.png" alt="Guthaben" />
-                                <div style={{position:"absolute", left:"60%", top:"60%", fontSize:20, fontWeight:700, color:"white"}}>1234</div>
-                                </div>
-                            </td>
-                            <td>
-                                <img width="100%" src="/img/Aktion.png" alt="Aktion" />
-                            </td>
-                            <td>
-                                <img width="100%" src="/img/Abstimmung.png" alt="Abstimmung" />
-                            </td>
+                            <td>aaaaa</td>
+                            <td>1</td>
+                            <td><button onClick={()=> handleVote("aaaaa")}>Dafür abstimmen</button></td>
                         </tr>
                         <tr>
-                            <td>
-                                <img width="100%" src={`/img/Baumhaus-${uiState.getBaumhausLevel()}.png`} />
-                            </td>
-                            <td>
-                                <img width="100%" src={`/img/Zelt-${uiState.getZeltLevel()}.png`} />
-                            </td>
-                            <td>
-                                <img width="100%" src={`/img/Berg-${uiState.getBergLevel()}.png`} />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Baumhaus: {uiState.baumhaus.toLocaleString(undefined, {maximumFractionDigits:1 })}
-                            </td>
-                            <td>
-                                Zelt: {uiState.zelt.toLocaleString(undefined, {maximumFractionDigits:1 })}
-                            </td>
-                            <td>
-                                Berg: {uiState.berg.toLocaleString(undefined, {maximumFractionDigits:1 })}
-                            </td>
+                            <td>bbbbb</td>
+                            <td>1</td>
+                            <td><button onClick={()=> handleVote("bbbbb")}>Dafür abstimmen</button></td>
                         </tr>
                     </tbody>
-                </table>
+                    </table>
             </div>
             <div className="pageSectionButton">
                 <Link to="/">Play</Link> | <Link to="/plan">Plan</Link> | <Link to="/run">Run</Link>

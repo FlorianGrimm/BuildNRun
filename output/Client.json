@@ -1,0 +1,80 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "BuildNRun",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:44319/"
+    }
+  ],
+  "paths": {
+    "/api/Build": {
+      "get": {
+        "tags": [
+          "Build"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HouseModel": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "money": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "baumhaus": {
+            "$ref": "#/components/schemas/HouseModel"
+          },
+          "zelt": {
+            "$ref": "#/components/schemas/HouseModel"
+          },
+          "berg": {
+            "$ref": "#/components/schemas/HouseModel"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

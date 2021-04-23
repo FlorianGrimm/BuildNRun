@@ -1,39 +1,54 @@
 import Services from './service';
+import { UserModel } from './service/client';
 
 export class UIState {
-    baumhaus: number;
-    zelt: number;
-    berg: number;
-    constructor() {
-        this.baumhaus = 1;
-        this.zelt = 3.1111;
-        this.berg = 2.49444;
+    userModel: UserModel;
+    constructor(userModel: UserModel) {
+        this.userModel = userModel;
+        // this.baumhaus = 1;
+        // this.zelt = 3.1111;
+        // this.berg = 2.49444;
     }
+
+    get baumhaus() : number {
+        return this.userModel.baumhaus?.level || 0.0;
+    }
+    get zelt() : number {
+        return this.userModel.zelt?.level || 0.0;
+    }
+    get berg() : number {
+        return this.userModel.berg?.level || 0.0;
+    }
+
     getBaumhausLevel() {
-        if (this.baumhaus >= 3) return 3;
-        if (this.baumhaus >= 2) return 2;
-        return 1;
+        const value = this.baumhaus;
+        return (value >= 3) ? 3 : (value >= 2) ? 2 : 1;
     }
     getZeltLevel() {
-        if (this.zelt >= 3) return 3;
-        if (this.zelt >= 2) return 2;
-        return 1;
+        const value = this.userModel.zelt?.level || 0.0;
+        return (value >= 3) ? 3 : (value >= 2) ? 2 : 1;
     }
     getBergLevel() {
-        if (this.berg >= 3) return 3;
-        if (this.berg >= 2) return 2;
-        return 1;
+        const value = this.userModel.berg?.level || 0.0;
+        return (value >= 3) ? 3 : (value >= 2) ? 2 : 1;
     }
 }
 
 export class GlobalState {
     services: Services;
     uiState: UIState;
+    userModel: UserModel;
     constructor(services: Services) {
         this.services = services;
-        this.uiState = new UIState();
+        this.userModel = new UserModel();
+        this.uiState = new UIState(this.userModel);
+    }
+    setUserModel(userModel: UserModel) {
+        this.userModel = userModel;
+        this.uiState.userModel = userModel;
     }
 }
+
 var _GlobalState: GlobalState;
 export default class RootState {
     constructor(services: Services) {

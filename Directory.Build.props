@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <Company>SEW</Company>
+    <Authors></Authors>
+    <Product>AVTV2</Product>
+    <Title>AVTV2</Title>
+    <RootDirectory>$(MSBuildThisFileDirectory)</RootDirectory>
+    <BaseIntermediateOutputPath>$(RootDirectory)output\$(MSBuildProjectName)\obj\$(PlatformName)</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(RootDirectory)output\$(MSBuildProjectName)\bin\$(PlatformName)</BaseOutputPath>
+    <LangVersion>Latest</LangVersion>
+  </PropertyGroup>
+</Project>

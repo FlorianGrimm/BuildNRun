@@ -10,6 +10,8 @@ import RootState from './RootState';
 import HomeView from './HomeView';
 import PlanView from './PlanView';
 import RunView from './RunView';
+import AktionView from './AktionView';
+import AbstimmungView from './Abstimmung';
 
 export interface AppProps {
     rootState: RootState;
@@ -37,10 +39,10 @@ export default class App extends Component<AppProps, AppState> {
                         <HomeView rootState={this.props.rootState} />
                     </Route>
                     <Route path="/aktion">
-                        <HomeView rootState={this.props.rootState} />
+                        <AktionView rootState={this.props.rootState} />
                     </Route>
                     <Route path="/abstimmung">
-                        <HomeView rootState={this.props.rootState} />
+                        <AbstimmungView rootState={this.props.rootState} />
                     </Route>
                     <Route path="/plan">
                         <PlanView rootState={this.props.rootState} />
