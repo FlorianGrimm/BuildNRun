@@ -13,9 +13,9 @@
         width: 100vw;
         height: 30px;
         position: absolute;
-        border-bottom-color:white;
-        border-bottom-style:solid;
-        border-bottom-width:1px;
+        border-bottom-color: white;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
     }
 
         body > div#header a,
@@ -41,11 +41,13 @@
             padding: 2px;
             height: 26px;
             display: inline-block;
-            vertical-align:baseline;
+            vertical-align: baseline;
         }
-            body > div#header a {
-                text-decoration: none;
-            }
+
+        body > div#header a {
+            text-decoration: none;
+        }
+
     body > div#content {
         margin: 0;
         padding: 0;
@@ -55,29 +57,45 @@
         bottom: 0;
     }
 
-    div.page,
-    div.root {
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-        height: calc(100vh - 30px);
-    }
-    div.pageSection,
-    div.pageSectionTop,
-    div.pageSectionContent,
-    div.pageSectionButton{
-        margin: 0;
-        padding: 0;
-        width: 100vw;
-    }
-    div.pageSectionTop{
-        height: 100px;
-    }
+div.page,
+div.root {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: calc(100vh - 30px);
+}
 
-    div.pageSectionContent{
-        height: calc(100vh - 230px);
-    }
+div.pageSection,
+div.pageSectionTop,
+div.pageSectionContent,
+div.pageSectionButton {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+}
 
-    div.pageSectionButton{
-        height: 100px;
-    }
+div.pageSectionTop {
+    height: 100px;
+}
+
+div.pageSectionContent {
+    height: calc(100vh - 230px);
+}
+
+div.pageSectionButton {
+    height: 100px;
+}
+
+div#root {
+    z-index: 2;
+}
+
+div#bingmap {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 20px;
+    height: 20px;
+    z-index: 1;
+    visibility: hidden;
+}

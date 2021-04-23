@@ -106,7 +106,19 @@ export default function PlanView(props: PlanViewProps) {
 
     useEffect(() => {
         if (isMountedRef.current === 0) {
-            isMountedRef.current = 1;
+            if (mapRef.current) {
+                const divbingmap = window.document.getElementById("bingmap") as HTMLDivElement | null;
+                if (divbingmap) {
+                    isMountedRef.current = 1;
+                    var iw = window.innerWidth - 40;
+                    var ih = window.innerHeight - 40;
+                    if (iw > 600) { iw = 600; }
+                    if (ih > 400) { ih = 400; }
+                    divbingmap.style.visibility="hidden";
+                    divbingmap.style.width = `${iw}px`;
+                    divbingmap.style.height = `${ih}px`;
+                }
+            }
         }
         return () => {
             if (mapRef.current) {
@@ -115,12 +127,11 @@ export default function PlanView(props: PlanViewProps) {
                 isMountedRef.current = -1;
             }
         };
-    }, [mapRef.current !== null]);
+    }, [mapRef.current]);
 
     useEffect(() => {
         if (mapRef.current !== null && isMountedRef.current > 0) {
             if (geoLocation === undefined) {
-                debugger;
                 props.rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
                     (geoLocation) => {
                         if (isMountedRef.current > 0) {
@@ -137,7 +148,7 @@ export default function PlanView(props: PlanViewProps) {
                 );
             }
         }
-    }, [isMountedRef.current > 0]);
+    }, [isMountedRef.current]);
 
     // const [state, dispatch] = useReducer(reducer, {
     //     mapCtrlLoaded: false,
@@ -160,34 +171,34 @@ export default function PlanView(props: PlanViewProps) {
     // );
 
     useEffect(() => {
-        if ((window as any).Microsoft) {
-            if (mapRef.current) {
-                if ((mapRouteState == undefined)) {
-                    const bingMapsService = props.rootState.getServices().bingMapsService;
-                    const mapConfig = bingMapsService.getMapConfig();
-                    if (geoLocation !== undefined) {
-                        if (geoLocation.latitude && !isNaN(geoLocation.latitude)
-                            && geoLocation.longitude && !isNaN(geoLocation.longitude)
-                            && Microsoft && Microsoft.Maps && Microsoft.Maps.Location) {
-                            var center = new Microsoft.Maps.Location(geoLocation.latitude, geoLocation.longitude);
-                            mapConfig.center = center
-                        }
-                    }
-                    mapConfig.showScalebar = true;
-                    mapConfig.showLocateMeButton = true;
-                    mapConfig.mapTypeId = Microsoft.Maps.MapTypeId.aerial;
-                    mapConfig.zoom = 14
-                    console.log("new Microsoft.Maps.Map");
-                    const mapRoute = bingMapsService.createMap(mapRef.current, mapConfig);
-                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangestart', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchange', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangeend', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                    // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
-                    //dispatch({ type: "mapRoute", mapRoute: mapRoute });
-                    setMapRoute(mapRoute);
-                }
-            }
-        }
+        // if ((window as any).Microsoft) {
+        //     if (mapRef.current) {
+        //         if ((mapRouteState == undefined)) {
+        //             const bingMapsService = props.rootState.getServices().bingMapsService;
+        //             const mapConfig = bingMapsService.getMapConfig();
+        //             if (geoLocation !== undefined) {
+        //                 if (geoLocation.latitude && !isNaN(geoLocation.latitude)
+        //                     && geoLocation.longitude && !isNaN(geoLocation.longitude)
+        //                     && Microsoft && Microsoft.Maps && Microsoft.Maps.Location) {
+        //                     var center = new Microsoft.Maps.Location(geoLocation.latitude, geoLocation.longitude);
+        //                     mapConfig.center = center
+        //                 }
+        //             }
+        //             mapConfig.showScalebar = true;
+        //             mapConfig.showLocateMeButton = true;
+        //             mapConfig.mapTypeId = Microsoft.Maps.MapTypeId.aerial;
+        //             mapConfig.zoom = 14
+        //             console.log("new Microsoft.Maps.Map");
+        //             const mapRoute = bingMapsService.createMap(mapRef.current, mapConfig);
+        //             // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangestart', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+        //             // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchange', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+        //             // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewchangeend', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+        //             // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
+        //             //dispatch({ type: "mapRoute", mapRoute: mapRoute });
+        //             setMapRoute(mapRoute);
+        //         }
+        //     }
+        // }
     }, [((window as any).Microsoft) && (mapRef.current === undefined) && (mapRouteState === undefined)]);
     /*
     useEffect(
@@ -285,13 +296,17 @@ debugger;
     */
     //onNewRoute = useCallback()
     //<button onClick={} >New Route</button>
+    var mapStyle: React.CSSProperties = {
+        backgroundColor: "darkgray",
+        visibility: ((true) ? "visible" : "hidden")
+    };
     return (
         <div className="page">
             <div className="pageSectionTop">
                 PlanView
                 <Link to="/">Play</Link> | <Link to="/plan">Plan</Link> | <Link to="/run">Run</Link>
             </div>
-            <div className="pageSectionContent" style={{ backgroundColor: "darkgray" }} ref={mapRef}>
+            <div className="pageSectionContent" style={mapStyle} ref={mapRef}>
                 <div>
                     Landkarte wird geladen
                 </div>
