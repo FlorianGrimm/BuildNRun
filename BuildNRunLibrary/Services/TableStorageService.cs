@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BuildNRunLibrary.Services {
+namespace BuildNRun.Services {
     public class TableStorageService : ITableStorageService {
         private readonly TableStorageOptions _Options;
 

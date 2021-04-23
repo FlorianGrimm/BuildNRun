@@ -1,4 +1,4 @@
-﻿namespace BuildNRunLibrary.Services {
+﻿namespace BuildNRun.Services {
     public interface ITableStorageService {
         bool IsConfigurationValid();
     }
