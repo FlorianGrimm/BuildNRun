@@ -20,8 +20,8 @@ export class Client {
     /**
      * @return Success
      */
-    build(): Promise<UserModel> {
-        let url_ = this.baseUrl + "/api/Build";
+    getAktionenList(): Promise<AktionenModel> {
+        let url_ = this.baseUrl + "/GetAktionenList";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ = <RequestInit>{
@@ -32,11 +32,48 @@ export class Client {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processBuild(_response);
+            return this.processGetAktionenList(_response);
         });
     }
 
-    protected processBuild(response: Response): Promise<UserModel> {
+    protected processGetAktionenList(response: Response): Promise<AktionenModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AktionenModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<AktionenModel>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getCurrentUser(): Promise<UserModel> {
+        let url_ = this.baseUrl + "/GetCurrentUser";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetCurrentUser(_response);
+        });
+    }
+
+    protected processGetCurrentUser(response: Response): Promise<UserModel> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -53,6 +90,311 @@ export class Client {
         }
         return Promise.resolve<UserModel>(<any>null);
     }
+
+    /**
+     * @return Success
+     */
+    getAbstimmung(): Promise<EigeneAbstimmungenModel> {
+        let url_ = this.baseUrl + "/Abstimmung";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAbstimmung(_response);
+        });
+    }
+
+    protected processGetAbstimmung(response: Response): Promise<EigeneAbstimmungenModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EigeneAbstimmungenModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<EigeneAbstimmungenModel>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    setAbstimmung(body: string | undefined): Promise<EigeneAbstimmungenModel> {
+        let url_ = this.baseUrl + "/Abstimmung";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ = <RequestInit>{
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processSetAbstimmung(_response);
+        });
+    }
+
+    protected processSetAbstimmung(response: Response): Promise<EigeneAbstimmungenModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EigeneAbstimmungenModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<EigeneAbstimmungenModel>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    kaufAktion(body: string | undefined): Promise<UserModel> {
+        let url_ = this.baseUrl + "/KaufAktion";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ = <RequestInit>{
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processKaufAktion(_response);
+        });
+    }
+
+    protected processKaufAktion(response: Response): Promise<UserModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<UserModel>(<any>null);
+    }
+}
+
+export class AktionenModel implements IAktionenModel {
+    readonly aktionen?: AktionModel[] | undefined;
+
+    constructor(data?: IAktionenModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["aktionen"])) {
+                (<any>this).aktionen = [] as any;
+                for (let item of _data["aktionen"])
+                    (<any>this).aktionen!.push(AktionModel.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AktionenModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new AktionenModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.aktionen)) {
+            data["aktionen"] = [];
+            for (let item of this.aktionen)
+                data["aktionen"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IAktionenModel {
+    aktionen?: AktionModel[] | undefined;
+}
+
+export class AktionModel implements IAktionModel {
+    name?: string | undefined;
+    level?: number;
+    baumhaus?: number;
+    berg?: number;
+    zelt?: number;
+
+    constructor(data?: IAktionModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.level = _data["level"];
+            this.baumhaus = _data["baumhaus"];
+            this.berg = _data["berg"];
+            this.zelt = _data["zelt"];
+        }
+    }
+
+    static fromJS(data: any): AktionModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new AktionModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["level"] = this.level;
+        data["baumhaus"] = this.baumhaus;
+        data["berg"] = this.berg;
+        data["zelt"] = this.zelt;
+        return data; 
+    }
+}
+
+export interface IAktionModel {
+    name?: string | undefined;
+    level?: number;
+    baumhaus?: number;
+    berg?: number;
+    zelt?: number;
+}
+
+export class EigeneAbstimmungenModel implements IEigeneAbstimmungenModel {
+    readonly eigeneAbstimmungen?: EigeneAbstimmungModel[] | undefined;
+
+    constructor(data?: IEigeneAbstimmungenModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["eigeneAbstimmungen"])) {
+                (<any>this).eigeneAbstimmungen = [] as any;
+                for (let item of _data["eigeneAbstimmungen"])
+                    (<any>this).eigeneAbstimmungen!.push(EigeneAbstimmungModel.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): EigeneAbstimmungenModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new EigeneAbstimmungenModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.eigeneAbstimmungen)) {
+            data["eigeneAbstimmungen"] = [];
+            for (let item of this.eigeneAbstimmungen)
+                data["eigeneAbstimmungen"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IEigeneAbstimmungenModel {
+    eigeneAbstimmungen?: EigeneAbstimmungModel[] | undefined;
+}
+
+export class EigeneAbstimmungModel implements IEigeneAbstimmungModel {
+    aktion?: string | undefined;
+    anzahl?: number;
+    eigene?: boolean;
+
+    constructor(data?: IEigeneAbstimmungModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.aktion = _data["aktion"];
+            this.anzahl = _data["anzahl"];
+            this.eigene = _data["eigene"];
+        }
+    }
+
+    static fromJS(data: any): EigeneAbstimmungModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new EigeneAbstimmungModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["aktion"] = this.aktion;
+        data["anzahl"] = this.anzahl;
+        data["eigene"] = this.eigene;
+        return data; 
+    }
+}
+
+export interface IEigeneAbstimmungModel {
+    aktion?: string | undefined;
+    anzahl?: number;
+    eigene?: boolean;
 }
 
 export class HouseModel implements IHouseModel {

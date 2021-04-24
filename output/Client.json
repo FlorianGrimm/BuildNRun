@@ -10,11 +10,168 @@
     }
   ],
   "paths": {
-    "/api/Build": {
+    "/GetAktionenList": {
+      "get": {
+        "tags": [
+          "Aktion"
+        ],
+        "operationId": "GetAktionenList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AktionenModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AktionenModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AktionenModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/GetCurrentUser": {
       "get": {
         "tags": [
           "Build"
         ],
+        "operationId": "GetCurrentUser",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Abstimmung": {
+      "get": {
+        "tags": [
+          "Build"
+        ],
+        "operationId": "GetAbstimmung",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigeneAbstimmungenModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigeneAbstimmungenModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigeneAbstimmungenModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Build"
+        ],
+        "operationId": "SetAbstimmung",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigeneAbstimmungenModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigeneAbstimmungenModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigeneAbstimmungenModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/KaufAktion": {
+      "post": {
+        "tags": [
+          "Build"
+        ],
+        "operationId": "KaufAktion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success",
@@ -42,6 +199,77 @@
   },
   "components": {
     "schemas": {
+      "AktionenModel": {
+        "type": "object",
+        "properties": {
+          "aktionen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AktionModel"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AktionModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "baumhaus": {
+            "type": "number",
+            "format": "float"
+          },
+          "berg": {
+            "type": "number",
+            "format": "float"
+          },
+          "zelt": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EigeneAbstimmungenModel": {
+        "type": "object",
+        "properties": {
+          "eigeneAbstimmungen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EigeneAbstimmungModel"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EigeneAbstimmungModel": {
+        "type": "object",
+        "properties": {
+          "aktion": {
+            "type": "string",
+            "nullable": true
+          },
+          "anzahl": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "eigene": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "HouseModel": {
         "type": "object",
         "properties": {

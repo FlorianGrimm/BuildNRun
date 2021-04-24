@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BuildNRun.Model;
 using BuildNRun.Service;
 
+
 using Microsoft.AspNetCore.Mvc;
 
 using Orleans;
@@ -24,8 +25,8 @@ namespace BuildNRun.Controllers {
             this._GrainFactory = grainFactory;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<UserModel>> GetUserModel() {
+        [HttpGet("/GetCurrentUser", Name = "GetCurrentUser")]
+        public async Task<ActionResult<UserModel>> GetCurrentUser() {
             var authenticatedUser = BuildNRun.Helper.UserHelper.GetAuthenticatedUser(this.User);
             if (authenticatedUser is null) {
                 return new ForbidResult();
@@ -33,6 +34,47 @@ namespace BuildNRun.Controllers {
                 var accountGrain = this._GrainFactory.GetGrain<IAccountGrain>(authenticatedUser);
                 var account = await accountGrain.GetAccount();
                 var userGrain = this._GrainFactory.GetGrain<IUserGrain>(account.UserId);
+                return await userGrain.GetUser();
+            }
+        }
+
+        [HttpGet("/Abstimmung", Name = "GetAbstimmung")]
+        public async Task<ActionResult<EigeneAbstimmungenModel>> GetAbstimmung() {
+            var authenticatedUser = BuildNRun.Helper.UserHelper.GetAuthenticatedUser(this.User);
+            if (authenticatedUser is null) {
+                return new ForbidResult();
+            } else {
+                var accountGrain = this._GrainFactory.GetGrain<IAccountGrain>(authenticatedUser);
+                var account = await accountGrain.GetAccount();
+                var abstimmungGrain = this._GrainFactory.GetGrain<IAbstimmungGrain>(0);
+                return await abstimmungGrain.GetAbstimmung(account.UserId);
+            }
+        }
+
+        [HttpPost("/Abstimmung", Name = "SetAbstimmung")]
+        public async Task<ActionResult<EigeneAbstimmungenModel>> SetAbstimmung([FromBody]string aktion) {
+            var authenticatedUser = BuildNRun.Helper.UserHelper.GetAuthenticatedUser(this.User);
+            if (authenticatedUser is null) {
+                return new ForbidResult();
+            } else {
+                var accountGrain = this._GrainFactory.GetGrain<IAccountGrain>(authenticatedUser);
+                var account = await accountGrain.GetAccount();
+                var abstimmungGrain = this._GrainFactory.GetGrain<IAbstimmungGrain>(0);
+                await abstimmungGrain.SetAktion(account.UserId, aktion);
+                return await abstimmungGrain.GetAbstimmung(account.UserId);
+            }
+        }
+
+        [HttpPost("/KaufAktion", Name = "KaufAktion")]
+        public async Task<ActionResult<UserModel>> KaufAktion([FromBody] string aktion) {
+            var authenticatedUser = BuildNRun.Helper.UserHelper.GetAuthenticatedUser(this.User);
+            if (authenticatedUser is null) {
+                return new ForbidResult();
+            } else {
+                var accountGrain = this._GrainFactory.GetGrain<IAccountGrain>(authenticatedUser);
+                var account = await accountGrain.GetAccount();
+                var userGrain = this._GrainFactory.GetGrain<IUserGrain>(account.UserId);
+                await userGrain.KaufAktion(account.UserId, aktion);
                 return await userGrain.GetUser();
             }
         }

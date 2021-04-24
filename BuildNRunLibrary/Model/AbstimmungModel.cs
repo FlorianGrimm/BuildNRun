@@ -1,7 +1,9 @@
 ﻿using Orleans;
 using Orleans.Concurrency;
+using Orleans.Runtime;
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,24 +17,94 @@ namespace BuildNRun.Model {
         public Dictionary<Guid, string> AktionProUser { get; set; }
     }
 
+    public class EigeneAbstimmungModel {
+        public EigeneAbstimmungModel() {
+        }
+
+        public EigeneAbstimmungModel(string aktion, int anzahl, bool eigene) {
+            this.Aktion = aktion;
+            this.Anzahl = anzahl;
+            this.Eigene = eigene;
+        }
+
+        public string Aktion { get; set; }
+        public int Anzahl { get; set; }
+        public bool Eigene { get; set; }
+    }
+
+    public class EigeneAbstimmungenModel {
+        public EigeneAbstimmungenModel() {
+            this.EigeneAbstimmungen = new List<EigeneAbstimmungModel>();
+        }
+
+        public List<EigeneAbstimmungModel> EigeneAbstimmungen { get; }
+    }
+
     public interface IAbstimmungGrain : IGrainWithIntegerKey {
-        Task<AbstimmungModel> GetAbstimmung();
-        Task SetAktion(Guid userId, string aktion);
+        Task<EigeneAbstimmungenModel> GetAbstimmung(Guid userId);
+        Task<bool> SetAktion(Guid userId, string aktion);
         Task GewinnVerteilung();
     }
 
     [Reentrant]
     public class AbstimmungGrain : Grain, IAbstimmungGrain {
-        public Task<AbstimmungModel> GetAbstimmung() {
-            throw new NotImplementedException();
+        private readonly IPersistentState<AbstimmungModel> _Abstimmung;
+
+        public AbstimmungGrain(
+                [PersistentState(Constants.TableAbstimmung, Constants.Store)] IPersistentState<AbstimmungModel> abstimmung
+            ) {
+            this._Abstimmung = abstimmung;
         }
 
-        public Task SetAktion(Guid userId, string aktion) {
-            throw new NotImplementedException();
+        public Task<EigeneAbstimmungenModel> GetAbstimmung(Guid userId) {
+            var dct = new Dictionary<string, EigeneAbstimmungModel>();
+            foreach (var aktion in AktionenModel.GetAktionen().Aktionen) {
+                dct.Add(aktion.Name, new EigeneAbstimmungModel(aktion.Name, 0, false));
+            }
+            var abstimmungen = this._Abstimmung.State.AktionProUser.Where((kv) => !string.IsNullOrEmpty(kv.Value));
+            foreach (var abstimmung in abstimmungen) {
+                if (dct.TryGetValue(abstimmung.Value, out var eigeneAbstimmung)) {
+                    eigeneAbstimmung.Anzahl++;
+                    if (abstimmung.Key == userId) {
+                        eigeneAbstimmung.Eigene = true;
+                    }
+                }
+            }
+
+            var result = new EigeneAbstimmungenModel();
+            result.EigeneAbstimmungen.AddRange(
+                    dct.Values.OrderBy(eigeneAbstimmung => eigeneAbstimmung.Aktion)
+                );
+            return Task.FromResult<EigeneAbstimmungenModel>(result);
         }
 
-        public Task GewinnVerteilung() {
-            throw new NotImplementedException();
+        public async Task<bool> SetAktion(Guid userId, string aktion) {
+            var erfolgreich = await this.GrainFactory.GetGrain<IUserGrain>(userId).AddMoney(-1);
+            if (erfolgreich) {
+                this._Abstimmung.State.AktionProUser[userId] = aktion;
+                await this._Abstimmung.WriteStateAsync();
+            }
+            return erfolgreich;
+        }
+
+        public async Task GewinnVerteilung() {
+            var aktionProUser = this._Abstimmung.State.AktionProUser;
+            var aktionenDerUser = aktionProUser.Where(kv => !string.IsNullOrEmpty(kv.Value)).ToList();
+            var count = aktionenDerUser.Count;
+            if (count > 0) {
+                foreach (var grp in aktionenDerUser.GroupBy(i => i.Value)) {
+                    var money = grp.Count();
+                    foreach (var item in grp) {
+                        await this.GrainFactory.GetGrain<IUserGrain>(item.Key).AddMoney(money);
+
+                    }
+                }
+                
+                foreach (var userId in aktionProUser.Keys.ToList()) {
+                    aktionProUser[userId] = string.Empty;
+                }
+                await this._Abstimmung.WriteStateAsync();
+            }
         }
     }
 }

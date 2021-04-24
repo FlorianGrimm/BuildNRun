@@ -12,14 +12,14 @@ if (rootElement && appRootConfig) {
     const services = new Services(appRootConfig);
     const rootState = new RootState(services);
     const appRootPath = window.location.pathname.toLowerCase().startsWith("/appoffline") ? "/AppOffline" : "/App";
-    ReactDOM.render(
-        (
-            <App rootState={rootState} appRootPath={appRootPath}></App>
-        ),
-        rootElement);
-    services.client.build().then((userModel)=>{
-        rootState.getGlobalState().setUserModel(userModel)
-        //rootState.getGlobalState().uiState.baumhaus = userModel;
+    services.client.getCurrentUser().then((userModel)=>{
+        rootState.getGlobalState().setUserModel(userModel);
+        ReactDOM.render(
+            (
+                <App rootState={rootState} appRootPath={appRootPath}></App>
+            ),
+            rootElement);
+    
     });
     if (window === undefined) registerSW();
 } else {

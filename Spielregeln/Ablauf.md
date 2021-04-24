@@ -56,17 +56,19 @@ TBD
 |----------------|----------|-------|------|
 | Level 1 Aktionen                         |
 | Schnee         | 0        | +0.1  | -0.1 |
-| Hain           | -0.1     | 0     | +0.1 |
-| Sonne          | +0.1 | -0.1 | 0    |
-| Level 2 Aktionen                    |
-| Pilze          | 0    | +0.1 | +0.1 |
-| Sonnenblume    | +0.1 | 0    | +0.1 |
-| Frühlingswind  | +0.1 | +0.1 | 0    |
-| Schimmel       | 0    | -0.1 | -0.1 |
-| Holzwürmer     | -0.1 | 0    | -0.1 |
-| Überschwemmung | -0.1 | -0.1 | 0    |
+| Regen          | -0.1     | 0     | +0.1 |
+| Sonne          | +0.1     | -0.1  | 0    |
+| -              | -        | -     | -    |
+| Level 2 Aktionen                         |
+| Pilze          | 0        | +0.1  | +0.1 |
+| Sonnenblume    | +0.1     | 0     | +0.1 |
+| Frühlingswind  | +0.1     | +0.1  | 0    |
+| Schimmel       | 0        | -0.1  | -0.1 |
+| Holzwürmer     | -0.1     | 0     | -0.1 |
+| Überschwemmung | -0.1     | -0.1  | 0    |
+| -              | -        | -     | -    |
 | Level 3 Aktionen                         |
 | Bürgerkrieg    | -0.1     | -0.1  | -0.1 |
-| Sonnwende      | +0.1     | +0.1  | +0.1 |
+| Sonnenwende    | +0.1     | +0.1  | +0.1 |
 | -              | -        | -     | -    |
  

@@ -3,6 +3,7 @@ using Orleans.Concurrency;
 using Orleans.Runtime;
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BuildNRun.Model {
@@ -35,7 +36,8 @@ namespace BuildNRun.Model {
             if (this._Account.RecordExists) {
                 var userId = System.Guid.NewGuid();
                 this._Account.State.UserId = userId;
-                this._Account.State.Name = userId.ToString("N");
+                var name = this.GetPrimaryKeyString();
+                this._Account.State.Name = name.Split('@').First();
                 await this._Account.WriteStateAsync();
                 var userGrain = this.GrainFactory.GetGrain<IUserGrain>(userId);
                 await userGrain.GetUser();

@@ -3,6 +3,7 @@ using Orleans.Concurrency;
 using Orleans.Runtime;
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BuildNRun.Model {
@@ -25,7 +26,8 @@ namespace BuildNRun.Model {
     public interface IUserGrain : IGrainWithGuidKey {
         Task<UserModel> GetUser();
         Task SetName(string name);
-        Task AddMoney(int money);
+        Task<bool> AddMoney(int money);
+        Task KaufAktion(Guid userId, string aktion);
     }
 
     [Reentrant]
@@ -59,9 +61,36 @@ namespace BuildNRun.Model {
             await this._User.WriteStateAsync();
         }
 
-        public async Task AddMoney(int money) {
+        public async Task<bool> AddMoney(int money) {
+            if (money < 0){
+                if (this._User.State.Money > money){
+                    return false;
+                }
+            }
             this._User.State.Money += money;
             await this._User.WriteStateAsync();
+            return true;
+        }
+
+        public async Task KaufAktion(Guid userId, string aktion) {
+            var aktionModel = AktionenModel.GetAktionen().Aktionen
+                .FirstOrDefault(m => string.Equals(m.Name, aktion, StringComparison.Ordinal));
+            if (aktionModel is object) {
+                var userModel = this._User.State;
+                if (aktionModel.Level <= userModel.Money) {
+                    userModel.Money -= aktionModel.Level;
+                    if (aktionModel.Baumhaus > 0) {
+                        userModel.Baumhaus.Level += aktionModel.Baumhaus;
+                    }
+                    if (aktionModel.Berg > 0) {
+                        userModel.Berg.Level += aktionModel.Berg;
+                    }
+                    if (aktionModel.Zelt > 0) {
+                        userModel.Zelt.Level += aktionModel.Zelt;
+                    }
+                    await this._User.WriteStateAsync();
+                }
+            }
         }
     }
 }

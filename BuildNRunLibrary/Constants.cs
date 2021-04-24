@@ -7,6 +7,7 @@
         public const string Store = "AzureTable";
 
         public const string TableAccount = "Account";
+        public const string TableAbstimmung = "Abstimmung";
         public const string TableUser = "User";
         public const string TableLaufen = "Laufen";
 

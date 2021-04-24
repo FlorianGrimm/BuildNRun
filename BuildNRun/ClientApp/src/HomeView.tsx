@@ -27,7 +27,7 @@ export default function HomeView(props: HomeViewProps) {
                             <td>
                                 <div style={{position:"relative"}} >
                                 <img width="100%" src="/img/Guthaben.png" alt="Guthaben" />
-                                <div style={{position:"absolute", left:"60%", top:"60%", fontSize:20, fontWeight:700, color:"white"}}>1234</div>
+                                <div style={{position:"absolute", left:"60%", top:"60%", fontSize:20, fontWeight:700, color:"white"}}>{uiState.userModel.money}</div>
                                 </div>
                             </td>
                             <td>
