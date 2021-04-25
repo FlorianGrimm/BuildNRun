@@ -10,6 +10,13 @@ export interface HomeViewProps {
 
 export default function HomeView(props: HomeViewProps) {
     const uiState = props.rootState.getGlobalState().uiState;
+    const divbingmap = window.document.getElementById("bingmap") as HTMLDivElement | null;
+    if (divbingmap) {
+        if (divbingmap.style.visibility === "visible"){
+            divbingmap.style.visibility = "hidden";
+        }
+    }
+
     return (
         <div className="page">
             <div className="pageSectionTop">
