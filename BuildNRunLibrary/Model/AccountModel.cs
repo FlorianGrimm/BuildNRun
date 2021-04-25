@@ -33,18 +33,22 @@ namespace BuildNRun.Model {
         }
 
         public async Task<AccountModel> GetAccount() {
-            if (this._Account.RecordExists) {
-                var userId = System.Guid.NewGuid();
-                this._Account.State.UserId = userId;
-                var name = this.GetPrimaryKeyString();
-                this._Account.State.Name = name.Split('@').First();
-                await this._Account.WriteStateAsync();
-                var userGrain = this.GrainFactory.GetGrain<IUserGrain>(userId);
-                await userGrain.GetUser();
+            if (!this._Account.RecordExists) {
+                await this.InitializeAccount();
                 return this._Account.State;
             } else {
                 return this._Account.State;
             }
+        }
+
+        private async Task InitializeAccount() {
+            var userId = System.Guid.NewGuid();
+            this._Account.State.UserId = userId;
+            var name = this.GetPrimaryKeyString();
+            this._Account.State.Name = name.Split('@').First();
+            await this._Account.WriteStateAsync();
+            var userGrain = this.GrainFactory.GetGrain<IUserGrain>(userId);
+            await userGrain.GetUser();
         }
 
         public async Task SetName(string name) {

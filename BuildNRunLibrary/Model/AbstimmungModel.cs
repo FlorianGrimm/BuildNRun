@@ -49,11 +49,25 @@ namespace BuildNRun.Model {
     [Reentrant]
     public class AbstimmungGrain : Grain, IAbstimmungGrain {
         private readonly IPersistentState<AbstimmungModel> _Abstimmung;
+        private IDisposable _Timer;
 
         public AbstimmungGrain(
                 [PersistentState(Constants.TableAbstimmung, Constants.Store)] IPersistentState<AbstimmungModel> abstimmung
             ) {
             this._Abstimmung = abstimmung;
+        }
+
+        public override Task OnActivateAsync() {
+            this._Timer = this.RegisterTimer(asyncCallback: HandleTick, state: null, dueTime: TimeSpan.MaxValue, period: TimeSpan.FromHours(1));
+            return base.OnActivateAsync();
+        }
+        public override Task OnDeactivateAsync() {
+            this._Timer.Dispose();
+            return base.OnDeactivateAsync();
+        }
+        private async Task HandleTick(object _) {
+            //if (System.DateTime.UtcNow.Hour != 0) { return; }
+            await this.GewinnVerteilung();
         }
 
         public Task<EigeneAbstimmungenModel> GetAbstimmung(Guid userId) {
@@ -90,19 +104,27 @@ namespace BuildNRun.Model {
         public async Task GewinnVerteilung() {
             var aktionProUser = this._Abstimmung.State.AktionProUser;
             var aktionenDerUser = aktionProUser.Where(kv => !string.IsNullOrEmpty(kv.Value)).ToList();
+            var aktionen = AktionenModel.GetAktionen();
             var count = aktionenDerUser.Count;
             if (count > 0) {
-                foreach (var grp in aktionenDerUser.GroupBy(i => i.Value)) {
-                    var money = grp.Count();
-                    foreach (var item in grp) {
-                        await this.GrainFactory.GetGrain<IUserGrain>(item.Key).AddMoney(money);
-
-                    }
-                }
+                var grpByAktion = aktionenDerUser.GroupBy(i => i.Value);
+                var maxCount = grpByAktion.Max(grp => grp.Count());
+                var gewinnerAktionen = grpByAktion.Where(grp => (grp.Count() == maxCount))
+                    .Select(grp => grp.Key)
+                    .ToDictionary(aktion => aktion, aktion => aktionen.FindAktion(aktion));
                 
-                foreach (var userId in aktionProUser.Keys.ToList()) {
+                var verliehrerAktion = new AktionModel(string.Empty, 0, 0f, 0f, 0f, false);
+                foreach (var gewinnerAktion in gewinnerAktionen) { 
+                }
+                foreach (var kv in aktionProUser.ToList()) {
+                    var userId = kv.Key;
+                    if (gewinnerAktionen.TryGetValue(kv.Value, out var aktion)) {
+                    } else { 
+                    }
+                    //this.GrainFactory.GetGrain<>
                     aktionProUser[userId] = string.Empty;
                 }
+                
                 await this._Abstimmung.WriteStateAsync();
             }
         }

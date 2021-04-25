@@ -235,6 +235,9 @@
           "zelt": {
             "type": "number",
             "format": "float"
+          },
+          "forAll": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

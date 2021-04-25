@@ -80,6 +80,7 @@ div.pageSectionTop {
 
 div.pageSectionContent {
     height: calc(100vh - 230px);
+    overflow-y: scroll;
 }
 
 div.pageSectionButton {

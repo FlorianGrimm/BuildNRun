@@ -14,6 +14,8 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers;
 using Orleans.Serialization;
+using Orleans.Reminders.AzureStorage;
+using Orleans.Runtime.ReminderService;
 
 namespace BuildNRun {
     public class Program {
@@ -33,7 +35,12 @@ namespace BuildNRun {
                 })
                 .ConfigureApplicationParts((parts) => {
                     parts.AddApplicationPart(typeof(BuildNRun.Model.AccountGrain).Assembly).WithReferences();
-                });
+                })
+                //.UseAzureTableReminderService(options => {
+                //    options.ConnectionString = orleansOptions.DataConnectionString;
+                //})
+                //.UseInMemoryReminderService()
+                ;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

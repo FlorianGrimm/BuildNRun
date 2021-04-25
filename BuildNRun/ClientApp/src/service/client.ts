@@ -263,6 +263,7 @@ export class AktionModel implements IAktionModel {
     baumhaus?: number;
     berg?: number;
     zelt?: number;
+    forAll?: boolean;
 
     constructor(data?: IAktionModel) {
         if (data) {
@@ -280,6 +281,7 @@ export class AktionModel implements IAktionModel {
             this.baumhaus = _data["baumhaus"];
             this.berg = _data["berg"];
             this.zelt = _data["zelt"];
+            this.forAll = _data["forAll"];
         }
     }
 
@@ -297,6 +299,7 @@ export class AktionModel implements IAktionModel {
         data["baumhaus"] = this.baumhaus;
         data["berg"] = this.berg;
         data["zelt"] = this.zelt;
+        data["forAll"] = this.forAll;
         return data; 
     }
 }
@@ -307,6 +310,7 @@ export interface IAktionModel {
     baumhaus?: number;
     berg?: number;
     zelt?: number;
+    forAll?: boolean;
 }
 
 export class EigeneAbstimmungenModel implements IEigeneAbstimmungenModel {

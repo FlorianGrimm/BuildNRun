@@ -62,8 +62,8 @@ namespace BuildNRun.Model {
         }
 
         public async Task<bool> AddMoney(int money) {
-            if (money < 0){
-                if (this._User.State.Money > money){
+            if (money < 0) {
+                if (this._User.State.Money > money) {
                     return false;
                 }
             }
@@ -79,15 +79,9 @@ namespace BuildNRun.Model {
                 var userModel = this._User.State;
                 if (aktionModel.Level <= userModel.Money) {
                     userModel.Money -= aktionModel.Level;
-                    if (aktionModel.Baumhaus > 0) {
-                        userModel.Baumhaus.Level += aktionModel.Baumhaus;
-                    }
-                    if (aktionModel.Berg > 0) {
-                        userModel.Berg.Level += aktionModel.Berg;
-                    }
-                    if (aktionModel.Zelt > 0) {
-                        userModel.Zelt.Level += aktionModel.Zelt;
-                    }
+                    userModel.Baumhaus.Add(aktionModel.Baumhaus, false);
+                    userModel.Berg.Add(aktionModel.Berg, false);
+                    userModel.Zelt.Add(aktionModel.Zelt, false);
                     await this._User.WriteStateAsync();
                 }
             }
