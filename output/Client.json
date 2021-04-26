@@ -195,6 +195,66 @@
           }
         }
       }
+    },
+    "/Routen": {
+      "get": {
+        "tags": [
+          "Build"
+        ],
+        "operationId": "GetRouten",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutenModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutenModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutenModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Build"
+        ],
+        "operationId": "SetRouten",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutenModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutenModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutenModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -273,12 +333,62 @@
         },
         "additionalProperties": false
       },
+      "GeoLocation": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
       "HouseModel": {
         "type": "object",
         "properties": {
           "level": {
             "type": "number",
             "format": "float"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LaufRouteModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "wayPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeoLocation"
+            },
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RoutenModel": {
+        "type": "object",
+        "properties": {
+          "routen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LaufRouteModel"
+            },
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false

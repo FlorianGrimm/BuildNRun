@@ -211,6 +211,81 @@ export class Client {
         }
         return Promise.resolve<UserModel>(<any>null);
     }
+
+    /**
+     * @return Success
+     */
+    getRouten(): Promise<RoutenModel> {
+        let url_ = this.baseUrl + "/Routen";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetRouten(_response);
+        });
+    }
+
+    protected processGetRouten(response: Response): Promise<RoutenModel> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RoutenModel.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<RoutenModel>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    setRouten(body: RoutenModel | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/Routen";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ = <RequestInit>{
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processSetRouten(_response);
+        });
+    }
+
+    protected processSetRouten(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(<any>null);
+    }
 }
 
 export class AktionenModel implements IAktionenModel {
@@ -401,6 +476,46 @@ export interface IEigeneAbstimmungModel {
     eigene?: boolean;
 }
 
+export class GeoLocation implements IGeoLocation {
+    latitude?: number;
+    longitude?: number;
+
+    constructor(data?: IGeoLocation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.latitude = _data["latitude"];
+            this.longitude = _data["longitude"];
+        }
+    }
+
+    static fromJS(data: any): GeoLocation {
+        data = typeof data === 'object' ? data : {};
+        let result = new GeoLocation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["latitude"] = this.latitude;
+        data["longitude"] = this.longitude;
+        return data; 
+    }
+}
+
+export interface IGeoLocation {
+    latitude?: number;
+    longitude?: number;
+}
+
 export class HouseModel implements IHouseModel {
     level?: number;
 
@@ -435,6 +550,102 @@ export class HouseModel implements IHouseModel {
 
 export interface IHouseModel {
     level?: number;
+}
+
+export class LaufRouteModel implements ILaufRouteModel {
+    id?: number;
+    name?: string | undefined;
+    readonly wayPoints?: GeoLocation[] | undefined;
+
+    constructor(data?: ILaufRouteModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["wayPoints"])) {
+                (<any>this).wayPoints = [] as any;
+                for (let item of _data["wayPoints"])
+                    (<any>this).wayPoints!.push(GeoLocation.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): LaufRouteModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new LaufRouteModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.wayPoints)) {
+            data["wayPoints"] = [];
+            for (let item of this.wayPoints)
+                data["wayPoints"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface ILaufRouteModel {
+    id?: number;
+    name?: string | undefined;
+    wayPoints?: GeoLocation[] | undefined;
+}
+
+export class RoutenModel implements IRoutenModel {
+    readonly routen?: LaufRouteModel[] | undefined;
+
+    constructor(data?: IRoutenModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["routen"])) {
+                (<any>this).routen = [] as any;
+                for (let item of _data["routen"])
+                    (<any>this).routen!.push(LaufRouteModel.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RoutenModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new RoutenModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.routen)) {
+            data["routen"] = [];
+            for (let item of this.routen)
+                data["routen"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IRoutenModel {
+    routen?: LaufRouteModel[] | undefined;
 }
 
 export class UserModel implements IUserModel {

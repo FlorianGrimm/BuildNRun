@@ -1,17 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>3ed8e0a2-307d-4b21-b79a-d9a5ee68301c</UserSecretsId>
     <RootNamespace>BuildNRun</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\ITableStorageService.cs" />
-    <Compile Remove="Services\JwtBearerOptions.cs" />
-    <Compile Remove="Services\SimplePersistence.cs" />
-    <Compile Remove="Services\TableStorageOptions.cs" />
-    <Compile Remove="Services\TableStorageService.cs" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,14 +25,6 @@
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.2" />
     <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="3.4.2" />
     <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="3.4.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Services\ITableStorageService.cs" />
-    <None Include="Services\JwtBearerOptions.cs" />
-    <None Include="Services\SimplePersistence.cs" />
-    <None Include="Services\TableStorageOptions.cs" />
-    <None Include="Services\TableStorageService.cs" />
   </ItemGroup>
 
 </Project>
