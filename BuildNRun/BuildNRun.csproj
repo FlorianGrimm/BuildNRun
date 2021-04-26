@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UserSecretsId>445db47a-7954-41cf-9ade-ee0ad0a9ba88</UserSecretsId>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
@@ -21,15 +21,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\BuildNRunLibrary\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Identity.Web" Version="1.9.1" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.9.1" />
-    <!--
-
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="3.4.2">
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.4.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    -->
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.2" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.2" />
     <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="3.4.2" />
@@ -91,7 +92,7 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Condition="!(Exists('$(NuGetPackageRoot)swashbuckle.aspnetcore.cli'))" Command="dotnet tool restore"></Exec>
     <Exec Command="dotnet swagger tofile --output &quot;$(ProjectDir)..\output\Client.json&quot;  --host https://localhost:44319/ &quot;$(TargetPath)&quot; v1" />
-    <Exec Condition="Exists('$(ProjectDir)..\output\Client.json')" Command="$(NSwagExe_Core31) openapi2tsclient /input:&quot;$(ProjectDir)..\output\Client.json&quot; /output:&quot;$(ProjectDir)ClientApp\src\service\client.ts&quot; /ExportTypes:true /GenerateDtoTypes:true" />
+    <Exec Condition="Exists('$(ProjectDir)..\output\Client.json')" Command="$(NSwagExe_Net50) openapi2tsclient /input:&quot;$(ProjectDir)..\output\Client.json&quot; /output:&quot;$(ProjectDir)ClientApp\src\service\client.ts&quot; /ExportTypes:true /GenerateDtoTypes:true" />
   </Target>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>

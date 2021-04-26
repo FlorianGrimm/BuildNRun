@@ -78,6 +78,33 @@ namespace BuildNRun.Controllers {
                 return await userGrain.GetUser();
             }
         }
+
+        [HttpGet("/Routen", Name = "GetRouten")]
+        public async Task<ActionResult<RoutenModel>> GetRouten() {
+            var authenticatedUser = BuildNRun.Helper.UserHelper.GetAuthenticatedUser(this.User);
+            if (authenticatedUser is null) {
+                return new ForbidResult();
+            } else {
+                var accountGrain = this._GrainFactory.GetGrain<IAccountGrain>(authenticatedUser);
+                var account = await accountGrain.GetAccount();
+                var routenGrain = this._GrainFactory.GetGrain<IRoutenGrain>(account.UserId);
+                return await routenGrain.GetRouten();
+            }
+        }
+
+        [HttpPost("/Routen", Name = "SetRouten")]
+        public async Task<ActionResult> SetRouten([FromBody]RoutenModel value) {
+            var authenticatedUser = BuildNRun.Helper.UserHelper.GetAuthenticatedUser(this.User);
+            if (authenticatedUser is null) {
+                return new ForbidResult();
+            } else {
+                var accountGrain = this._GrainFactory.GetGrain<IAccountGrain>(authenticatedUser);
+                var account = await accountGrain.GetAccount();
+                var routenGrain = this._GrainFactory.GetGrain<IRoutenGrain>(account.UserId);
+                await routenGrain.SetRouten(value);
+                return new OkResult();
+            }
+        }
     }
 }
 // https://localhost:44319/swagger/index.html

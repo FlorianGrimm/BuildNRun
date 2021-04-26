@@ -10,8 +10,11 @@ namespace BuildNRun.Model {
     [Serializable]
     public class LaufenModel {
         public LaufenModel() {
+            this.Vorgabe = new LaufRouteModel();
+            this.Lauf = new LaufRouteModel();
         }
         public LaufRouteModel Vorgabe { get; set; }
+        public LaufRouteModel Lauf { get; set; }
     }
 
     public interface ILaufGrain : IGrainWithGuidKey {

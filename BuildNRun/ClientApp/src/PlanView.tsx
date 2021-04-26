@@ -9,6 +9,8 @@ import GeoLocationService from './service/GeoLocationService';
 import MapRoute from './service/MapRoute';
 import { useReduceAsync } from './useUtilities';
 import { GeoCoordinates, GeoPosition } from './types';
+import { GeoLocation, LaufRouteModel, RoutenModel } from './service/client';
+import BingMapsService from './service/BingMapsService';
 //import BingMapsService from './service/BingMapsService';
 //import {useOnce} from './useUtilities';
 
@@ -20,88 +22,59 @@ enum LoadingState {
     Init,
     Loading,
     LibraryLoaded,
+    WaitingForModel,
     Running,
     Done
 }
-type InitialState = {
-    mapCtrlLoaded: boolean;
-    mapRoute: MapRoute | null;
-    geoLocation: GeoPosition;
-};
-function getInitialState(): InitialState {
-    return {
-        mapCtrlLoaded: false,
-        mapRoute: null,
-        geoLocation: GeoLocationService.getPosition00()
-    };
-}
-;
-type State = {
-    mapCtrlLoaded: boolean;
-    mapRoute: MapRoute | null;
-    geoLocation: GeoCoordinates | null;
-};
 
-type Action =
-    { type: 'NewRoute' }
-    | { type: 'DeleteRoute' }
-    | { type: "mapCtrlLoaded" }
-    | { type: "mapRoute", mapRoute: MapRoute }
-    | { type: "setGeoLocation", geoLocation: GeoCoordinates }
-    ;
-function reducer(state: State, action: Action): State {
-    switch (action.type) {
-        case "NewRoute":
-            return state;
-        case "DeleteRoute":
-            return state;
-        case "mapCtrlLoaded":
-            return { ...state, mapCtrlLoaded: true };
-        case "mapRoute":
-            return { ...state, mapRoute: action.mapRoute };
-        case "setGeoLocation":
-            return { ...state, geoLocation: action.geoLocation };
+function newRoute(center: Microsoft.Maps.Location, directionsManager: Microsoft.Maps.Directions.DirectionsManager) {
+    directionsManager.clearAll();
+    var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude, center.longitude) });
+    directionsManager.addWaypoint(waypoint1);
+    var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude, center.longitude + 0.002) });
+    directionsManager.addWaypoint(waypoint2);
+    var waypoint3 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.002, center.longitude + 0.002) });
+    directionsManager.addWaypoint(waypoint3);
+    var waypoint4 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.002, center.longitude) });
+    directionsManager.addWaypoint(waypoint4);
+    var waypoint5 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.0001, center.longitude + 0.0001) });
+    directionsManager.addWaypoint(waypoint5);
+    directionsManager.setRenderOptions({
+        firstWaypointPushpinOptions: { draggable: true },
+        lastWaypointPushpinOptions: { draggable: true },
+        waypointPushpinOptions: { draggable: true }
+    })
+    directionsManager.setRequestOptions({ routeDraggable: true, routeMode: Microsoft.Maps.Directions.RouteMode.walking });
+    directionsManager.calculateDirections();
+}
+function loadRoute(arrLocation: GeoLocation[], directionsManager: Microsoft.Maps.Directions.DirectionsManager) {
+    directionsManager.clearAll();
+    for (let idx = 0; idx < arrLocation.length; idx++) {
+        const getLocation = arrLocation[idx];
+        var waypoint = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(getLocation.latitude, getLocation.longitude) });
+        directionsManager.addWaypoint(waypoint);
     }
-    return state;
+    directionsManager.setRenderOptions({
+        firstWaypointPushpinOptions: { draggable: true },
+        lastWaypointPushpinOptions: { draggable: true },
+        waypointPushpinOptions: { draggable: true }
+    })
+    directionsManager.setRequestOptions({ routeDraggable: true, routeMode: Microsoft.Maps.Directions.RouteMode.walking });
+    directionsManager.calculateDirections();
+}
+function saveRoute(directionsManager: Microsoft.Maps.Directions.DirectionsManager): GeoLocation[] {
+    var arrLocation: GeoLocation[] = [];
+    const allWaypoints = directionsManager.getAllWaypoints();
+
+    for (let idx = 0; idx < allWaypoints.length; idx++) {
+        const waypoint = allWaypoints[idx];
+        const location = waypoint.getLocation();
+        arrLocation.push(new GeoLocation({ latitude: location.latitude, longitude: location.longitude }));
+    }
+
+    return arrLocation;
 }
 
-type ActionAsync =
-    { type: "viewchange", mapRoute: MapRoute }
-    | { type: "loadMapControl" }
-    | { type: "getCurrentPosition" }
-    ;
-
-function handleActionAsync(
-    action: ActionAsync,
-    { rootState, dispatch }: { rootState: RootState, dispatch: (value: Action) => void }
-) {
-    if (action.type === "viewchange") {
-        //
-        const location = action.mapRoute.map.getCenter();
-        console.log("dispatch.setGeoLocation");
-        dispatch({ type: "setGeoLocation", geoLocation: location })
-        //
-        return;
-    }
-    if (action.type === "loadMapControl") {
-        return rootState.getServices().bingMapsService.loadMapControlAsync(true).then(() => {
-            console.log("dispatch.loadMapControl");
-            dispatch({ type: "mapCtrlLoaded" })
-        });
-    }
-    if (action.type === "getCurrentPosition") {
-        rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
-            (geoLocation) => {
-                console.log("dispatch.setGeoLocation", geoLocation);
-                dispatch({ type: "setGeoLocation", geoLocation: geoLocation.coords });
-            },
-            (reason) => {
-                // TODO                
-            });
-        return;
-    }
-    return;
-}
 
 export default function PlanView(props: PlanViewProps) {
     const isMountedRef = useRef<number>(0);
@@ -109,8 +82,9 @@ export default function PlanView(props: PlanViewProps) {
     //const mapRef = useRef<HTMLDivElement>(null);
     const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.Init);
     const [mapRouteState, setMapRoute] = useState<MapRoute>();
-    //const [mapCtrlLoaded,setMapCtrlLoaded] = useState<boolean>();
     const [geoLocation, setGeoLocation] = useState<GeoCoordinates>();
+    const [model, setModel] = useState<RoutenModel>();
+    const [idxRoute, setIdxRoute] = useState<number>(-1);
 
     useEffect(() => {
         if ((isMountedRef.current === 0) && (loadingState === LoadingState.Init)) {
@@ -140,7 +114,15 @@ export default function PlanView(props: PlanViewProps) {
                 divbingmap.style.height = `${ih}px`;
             }
 
-            // if (geoLocation === undefined) { }
+            props.rootState.getServices().client.getRouten().then((m) => {
+                setModel(m);
+                return null;
+            }).then(() => {
+                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
+                    setLoadingState(LoadingState.LibraryLoaded);
+                    return null;
+                });
+            });
 
             props.rootState.getServices().geoLocationService.getCurrentPositionAsync().then(
                 (geoLocation) => {
@@ -153,19 +135,10 @@ export default function PlanView(props: PlanViewProps) {
                     setGeoLocation({ latitude: NaN, longitude: NaN });
                     return false;
                 }
-            ).then(() => {
-                Microsoft.Maps.loadModule('Microsoft.Maps.Directions', function () {
-                    setLoadingState(LoadingState.LibraryLoaded);
-                    return null;
-                });
-            });
+            )
         }
 
         if (loadingState === LoadingState.LibraryLoaded) {
-
-            // const map = new Microsoft.Maps.Map(mapEle, mapConfig);
-            // const directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-
             const divbingmap = window.document.getElementById("bingmap") as HTMLDivElement | null;
             if (divbingmap) {
 
@@ -191,59 +164,33 @@ export default function PlanView(props: PlanViewProps) {
                 // Microsoft.Maps.Events.addHandler(mapRoute.map, 'viewrendered', () => { pushAction({ type: 'viewchange', mapRoute: mapRoute }); });
                 //dispatch({ type: "mapRoute", mapRoute: mapRoute });
                 setMapRoute(mapRoute);
-                const directionsManager = mapRoute.directionsManager;
-                if (directionsManager.getAllWaypoints().length < 2) {
-                    if (geoLocation !== undefined) {
-                        if (geoLocation.latitude && !isNaN(geoLocation.latitude)
-                            && geoLocation.longitude && !isNaN(geoLocation.longitude)
-                            && Microsoft && Microsoft.Maps && Microsoft.Maps.Location) {
-                            var center = new Microsoft.Maps.Location(geoLocation.latitude, geoLocation.longitude);
-                            var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: center });
-                            directionsManager.addWaypoint(waypoint1);
-                            var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude, center.longitude + 0.002) });
-                            directionsManager.addWaypoint(waypoint2);
-                            var waypoint3 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.002, center.longitude + 0.002) });
-                            directionsManager.addWaypoint(waypoint3);
-                            var waypoint4 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.002, center.longitude) });
-                            directionsManager.addWaypoint(waypoint4);
-                            var waypoint5 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude, center.longitude) });
-                            directionsManager.addWaypoint(waypoint5);
-                            // directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
-                            directionsManager.calculateDirections();
-                        }
-                    }
+                var m: RoutenModel;
+                if (model && model.routen != undefined) {
+                    m = model;
+                } else {
+                    m = new RoutenModel({ routen: [] })
+                    setModel(m);
+                }
+                if (m.routen!.length === 0) {
+                    m.routen!.push(new LaufRouteModel());
+                }
 
-                    // directionsManager.clearAll();
-                    // var seattleWaypoint = new Microsoft.Maps.Directions.Waypoint({ address: 'Seattle, WA' });
-                    // directionsManager.addWaypoint(seattleWaypoint);
-                    // var tacomaWaypoint = new Microsoft.Maps.Directions.Waypoint({ address: 'Tacoma, WA', location: new Microsoft.Maps.Location(47.255134, -122.441650) });
-                    // directionsManager.addWaypoint(tacomaWaypoint);
+
+                if (m.routen && m.routen.length > 0 && m.routen[0] && m.routen[0].wayPoints) {
+                    loadRoute((m.routen[0].wayPoints) || [], mapRoute.directionsManager);
+                    setIdxRoute(0);
+                } else {
+                    loadRoute([], mapRoute.directionsManager);
+                    setIdxRoute(0);
                 }
                 setLoadingState(LoadingState.Running);
-
-                /*
-                var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(mapRoute.map);
-                if (directionsManager.getAllWaypoints().length < 2) {
-                    directionsManager.clearAll();
-                    var seattleWaypoint = new Microsoft.Maps.Directions.Waypoint({ address: 'Seattle, WA' });
-                    directionsManager.addWaypoint(seattleWaypoint);
-                    var tacomaWaypoint = new Microsoft.Maps.Directions.Waypoint({ address: 'Tacoma, WA', location: new Microsoft.Maps.Location(47.255134, -122.441650) });
-                    directionsManager.addWaypoint(tacomaWaypoint);
-                }
-
-                // Insert a waypoint
-                directionsManager.addWaypoint(new Microsoft.Maps.Directions.Waypoint({ address: 'Issaquah, WA', location: new Microsoft.Maps.Location(47.530094, -122.033798) }), 1);
-                // Set the element in which the itinerary will be rendered
-                directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
-                directionsManager.calculateDirections();
-
-                */
             }
         }
 
-        if (loadingState === 3) {
-
-        }
+        // if (loadingState === LoadingState.WaitingForModel) {
+        //     if (model===undefined){
+        //     }
+        // }
 
     }, [loadingState]);
 
@@ -270,36 +217,18 @@ export default function PlanView(props: PlanViewProps) {
     const handleNewRoute = () => {
         debugger;
         if (mapRouteState && mapRouteState.map && mapRouteState.directionsManager) {
-            const center = mapRouteState.map.getCenter()
+            const center = mapRouteState.map.getCenter();
             const directionsManager = mapRouteState.directionsManager;
-            directionsManager.clearAll();
-            var waypoint1 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude, center.longitude) });
-            directionsManager.addWaypoint(waypoint1);
-            var waypoint2 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude, center.longitude + 0.002) });
-            directionsManager.addWaypoint(waypoint2);
-            var waypoint3 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.002, center.longitude + 0.002) });
-            directionsManager.addWaypoint(waypoint3);
-            var waypoint4 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.002, center.longitude) });
-            directionsManager.addWaypoint(waypoint4);
-            var waypoint5 = new Microsoft.Maps.Directions.Waypoint({ location: new Microsoft.Maps.Location(center.latitude + 0.0001, center.longitude + 0.0001) });
-            directionsManager.addWaypoint(waypoint5);
-            // directionsManager.setRenderOptions({ itineraryContainer: document.getElementById('printoutPanel') });
-            directionsManager.setRenderOptions({
-                firstWaypointPushpinOptions:{draggable:true},
-                lastWaypointPushpinOptions:{draggable:true},
-                waypointPushpinOptions:{draggable:true}
-            })
-            directionsManager.setRequestOptions({routeDraggable:true,routeMode:Microsoft.Maps.Directions.RouteMode.walking});
-            directionsManager.calculateDirections();
+            newRoute(center, directionsManager);
         }
     };
-    const handleSave=()=>{
+    const handleSave = () => {
         debugger;
         if (mapRouteState && mapRouteState.map && mapRouteState.directionsManager) {
             const center = mapRouteState.map.getCenter()
             const directionsManager = mapRouteState.directionsManager;
             const allWaypoints = directionsManager.getAllWaypoints();
-            const wp = allWaypoints.map((wp)=>{wp.getLocation()});
+            const wp = allWaypoints.map((wp) => { wp.getLocation() });
             /*
                 export class Location {
                     // The location north or south of the equator from +90 to -90 
@@ -313,6 +242,13 @@ export default function PlanView(props: PlanViewProps) {
             //     allWaypoints[idx].getLocation()
             // }
             // [2].getLocation()
+        }
+    };
+    const handleNameChanged=(evt:React.ChangeEvent<HTMLInputElement>)=>{
+        if(      model && model.routen && model.routen){
+            if (idxRoute < model.routen.length){
+                model.routen[idxRoute].name = evt.target.value;
+            }
         }
     };
     console.log("loadingState", loadingState);
@@ -340,14 +276,48 @@ export default function PlanView(props: PlanViewProps) {
                             <table >
                                 <tbody>
                                     <tr>
+                                        <td>Name</td>
                                         <td>Aktion</td>
-                                        <td>Name</td>
-                                        <td>WP</td>
+                                        <td>Wegepunkte</td>
+                                        <td><button onClick={() => handleNewRoute()}>Neue Route</button></td>
                                     </tr>
+                                    {
+                                        model && model.routen && model.routen.map((item, idx) => {
+                                            if (false) {
+                                                return (
+                                                    <tr key={idx}>
+                                                        <td><button>Lauf</button><br />
+                                                            <button>Bearbeiten</button>
+                                                        </td>
+                                                        <td>{item.name || ""}</td>
+                                                        <td colSpan={2}>{item.wayPoints!.map((wp) => { return BingMapsService.convertDDToDMSString(wp.latitude!) + ":" + BingMapsService.convertDDToDMSString(wp.longitude!) + " " })}</td>
+                                                    </tr>
+                                                );
+                                            }
+                                            if (true) {
+                                                return (
+                                                    <tr key={idx}>
+                                                        <td><button>Speichern</button><br />
+                                                            <button>Löschen</button></td>
+                                                        <td><input value={item.name} onChange={()=>handleNameChanged} /></td>
+                                                        <td colSpan={2}>Wegepunkte</td>
+                                                    </tr>
+                                                );
+                                            }
+                                            return (
+                                                <tr key={idx}>
+                                                    <td>Name</td>
+                                                    <td><button onClick={() => handleNewRoute()}>new</button></td>
+                                                    <td colSpan={2}>Wegepunkte</td>
+                                                </tr>
+                                            );
+                                        })
+                                    }
+
                                     <tr>
-                                        <td><button>select</button></td>
+                                        <td><button>Bearbeiten</button></td>
                                         <td>Name</td>
-                                        <td>WP</td>
+                                        <td colSpan={2}>Wegepunkte</td>
                                     </tr>
                                     <tr>
                                         <td><button>save</button></td>
@@ -359,11 +329,7 @@ export default function PlanView(props: PlanViewProps) {
                                         <td>Name</td>
                                         <td>WP</td>
                                     </tr>
-                                    <tr>
-                                        <td><button onClick={() => handleNewRoute()}>new</button></td>
-                                        <td>Name</td>
-                                        <td>WP</td>
-                                    </tr>
+
                                 </tbody>
                             </table>
                         </div>

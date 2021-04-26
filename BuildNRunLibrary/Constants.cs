@@ -10,6 +10,7 @@
         public const string TableAbstimmung = "Abstimmung";
         public const string TableUser = "User";
         public const string TableLaufen = "Laufen";
+        public const string TableRouten = "Routen";
 
         /*
         public const string StreamProvider = "my-stream-provider";

@@ -28,9 +28,12 @@ using System.Text;
  */
 
 namespace BuildNRun.Model {
+    [Serializable]
     public class AktionModel {
         public AktionModel() {
+            this.Name = string.Empty;
         }
+        
         public AktionModel(string name, int level, float baumhaus, float berg, float zelt, bool forAll) {
             this.Name = name;
             this.Level = level;
@@ -91,6 +94,8 @@ namespace BuildNRun.Model {
             }
         }
     }
+
+    [Serializable]
     public class AktionenModel {
         private static AktionenModel? _Aktionen;
 
@@ -119,6 +124,7 @@ namespace BuildNRun.Model {
         public AktionenModel() {
             this.Aktionen = new List<AktionModel>();
         }
+
         public AktionenModel AddAktion(params AktionModel[] aktionModel) {
             this.Aktionen.AddRange(aktionModel);
             return this;

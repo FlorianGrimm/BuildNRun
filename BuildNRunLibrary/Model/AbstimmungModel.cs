@@ -17,8 +17,10 @@ namespace BuildNRun.Model {
         public Dictionary<Guid, string> AktionProUser { get; set; }
     }
 
+    [Serializable]
     public class EigeneAbstimmungModel {
         public EigeneAbstimmungModel() {
+            this.Aktion=string.Empty;
         }
 
         public EigeneAbstimmungModel(string aktion, int anzahl, bool eigene) {
@@ -32,6 +34,7 @@ namespace BuildNRun.Model {
         public bool Eigene { get; set; }
     }
 
+    [Serializable]
     public class EigeneAbstimmungenModel {
         public EigeneAbstimmungenModel() {
             this.EigeneAbstimmungen = new List<EigeneAbstimmungModel>();
@@ -50,7 +53,7 @@ namespace BuildNRun.Model {
     [Reentrant]
     public class AbstimmungGrain : Grain, IAbstimmungGrain {
         private readonly IPersistentState<AbstimmungModel> _Abstimmung;
-        private IDisposable _Timer;
+        private IDisposable? _Timer;
 
         public AbstimmungGrain(
                 [PersistentState(Constants.TableAbstimmung, Constants.Store)] IPersistentState<AbstimmungModel> abstimmung
@@ -63,7 +66,7 @@ namespace BuildNRun.Model {
             return base.OnActivateAsync();
         }
         public override Task OnDeactivateAsync() {
-            this._Timer.Dispose();
+            this._Timer?.Dispose();
             return base.OnDeactivateAsync();
         }
         private async Task HandleTick(object _) {

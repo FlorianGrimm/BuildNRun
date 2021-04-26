@@ -7,8 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace BuildNRun.Model {
+    [Serializable]
     public class UserModel {
         public UserModel() {
+            this.Name=string.Empty;
             this.Money = 0;
             this.Baumhaus = new HouseModel();
             this.Zelt = new HouseModel();

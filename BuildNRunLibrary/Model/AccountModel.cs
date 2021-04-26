@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 namespace BuildNRun.Model {
     [Serializable]
     public class AccountModel {
+        public AccountModel()
+        {
+            this.Name=string.Empty;
+        }
         public Guid UserId { get; set; }
         public string Name { get; set; }
     }
+
     public interface IAccountGrain : IGrainWithStringKey {
-        //   Task<IGameGrain> GetCurrentGame();
-        //   Task JoinGame(IGameGrain game);
-        //   Task LeaveGame(IGameGrain game);
         Task<AccountModel> GetAccount();
         Task SetName(string name);
     }
