@@ -261,8 +261,8 @@ export class AktionModel implements IAktionModel {
     name?: string | undefined;
     level?: number;
     baumhaus?: number;
-    berg?: number;
     zelt?: number;
+    berg?: number;
     forAll?: boolean;
 
     constructor(data?: IAktionModel) {
@@ -279,8 +279,8 @@ export class AktionModel implements IAktionModel {
             this.name = _data["name"];
             this.level = _data["level"];
             this.baumhaus = _data["baumhaus"];
-            this.berg = _data["berg"];
             this.zelt = _data["zelt"];
+            this.berg = _data["berg"];
             this.forAll = _data["forAll"];
         }
     }
@@ -297,8 +297,8 @@ export class AktionModel implements IAktionModel {
         data["name"] = this.name;
         data["level"] = this.level;
         data["baumhaus"] = this.baumhaus;
-        data["berg"] = this.berg;
         data["zelt"] = this.zelt;
+        data["berg"] = this.berg;
         data["forAll"] = this.forAll;
         return data; 
     }
@@ -308,8 +308,8 @@ export interface IAktionModel {
     name?: string | undefined;
     level?: number;
     baumhaus?: number;
-    berg?: number;
     zelt?: number;
+    berg?: number;
     forAll?: boolean;
 }
 

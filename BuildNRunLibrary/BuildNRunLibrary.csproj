@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>3ed8e0a2-307d-4b21-b79a-d9a5ee68301c</UserSecretsId>
     <RootNamespace>BuildNRun</RootNamespace>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

@@ -44,6 +44,7 @@ namespace BuildNRun.Model {
         Task<EigeneAbstimmungenModel> GetAbstimmung(Guid userId);
         Task<bool> SetAktion(Guid userId, string aktion);
         Task GewinnVerteilung();
+        Task<List<Guid>> GetUserIds();
     }
 
     [Reentrant]
@@ -114,19 +115,38 @@ namespace BuildNRun.Model {
                     .ToDictionary(aktion => aktion, aktion => aktionen.FindAktion(aktion));
                 
                 var verliehrerAktion = new AktionModel(string.Empty, 0, 0f, 0f, 0f, false);
-                foreach (var gewinnerAktion in gewinnerAktionen) { 
+                var nichtTeilnehmerAktion = new AktionModel(string.Empty, 0, 0f, 0f, 0f, false);
+                var gewinnerAktion = new AktionModel(string.Empty, 0, 0f, 0f, 0f, false);
+                var gesammtAktion = new AktionModel(string.Empty, 0, 0f, 0f, 0f, false);
+                foreach (var aktuelleGewinnerAktion in gewinnerAktionen.Where(kv=> (kv.Value is object) && (kv.Value.ForAll))) {
+                    nichtTeilnehmerAktion.AddGesammtTeilnehmer(aktuelleGewinnerAktion.Value!);
+                    verliehrerAktion.AddGesammtTeilnehmer(aktuelleGewinnerAktion.Value!);
+                    gewinnerAktion.AddGesammtTeilnehmer(aktuelleGewinnerAktion.Value!);
+                }
+                foreach (var aktuelleGewinnerAktion in gewinnerAktionen.Where(kv => (kv.Value is object) && (!kv.Value.ForAll))) {
+                    nichtTeilnehmerAktion.AddNichtTeilnehmer(aktuelleGewinnerAktion.Value!);
+                    verliehrerAktion.AddVerliehrer(aktuelleGewinnerAktion.Value!);
+                    gewinnerAktion.AddGewinner(aktuelleGewinnerAktion.Value!);
                 }
                 foreach (var kv in aktionProUser.ToList()) {
                     var userId = kv.Key;
-                    if (gewinnerAktionen.TryGetValue(kv.Value, out var aktion)) {
-                    } else { 
+                    IUserGrain userGrain = this.GrainFactory.GetGrain<IUserGrain>(userId);
+                    if (string.IsNullOrEmpty(kv.Value)) {
+                        await userGrain.GewinnVerteilung(nichtTeilnehmerAktion);
+                    } else if (gewinnerAktionen.TryGetValue(kv.Value, out var aktion)) {
+                        await userGrain.GewinnVerteilung(gewinnerAktion);
+                    } else {
+                        await userGrain.GewinnVerteilung(verliehrerAktion);
                     }
-                    //this.GrainFactory.GetGrain<>
                     aktionProUser[userId] = string.Empty;
                 }
-                
+
                 await this._Abstimmung.WriteStateAsync();
             }
+        }
+
+        public Task<List<Guid>> GetUserIds() {
+            return Task.FromResult(this._Abstimmung.State.AktionProUser.Keys.ToList());
         }
     }
 }

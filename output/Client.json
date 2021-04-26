@@ -228,11 +228,11 @@
             "type": "number",
             "format": "float"
           },
-          "berg": {
+          "zelt": {
             "type": "number",
             "format": "float"
           },
-          "zelt": {
+          "berg": {
             "type": "number",
             "format": "float"
           },

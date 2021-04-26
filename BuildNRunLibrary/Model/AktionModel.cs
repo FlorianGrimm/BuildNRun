@@ -43,9 +43,53 @@ namespace BuildNRun.Model {
         public string Name { get; set; }
         public int Level { get; set; }
         public float Baumhaus { get; set; }
-        public float Berg { get; set; }
         public float Zelt { get; set; }
+        public float Berg { get; set; }
         public bool ForAll { get; set; }
+
+        public void AddGewinner(AktionModel value) {
+            if (!value.ForAll) {
+                if (value.Baumhaus > 0) {
+                    this.Baumhaus += value.Baumhaus;
+                }
+                if (value.Zelt > 0) {
+                    this.Zelt += value.Zelt;
+                }
+                if (value.Berg > 0) {
+                    this.Berg += value.Berg;
+                }
+            }
+        }
+
+        public void AddVerliehrer(AktionModel value) {
+            if (!value.ForAll) {
+                if (value.Baumhaus < 0) {
+                    this.Baumhaus += value.Baumhaus;
+                }
+                if (value.Zelt < 0) {
+                    this.Zelt += value.Zelt;
+                }
+                if (value.Berg < 0) {
+                    this.Berg += value.Berg;
+                }
+            }
+        }
+
+        public void AddNichtTeilnehmer(AktionModel value) {
+            if (!value.ForAll) {
+                this.Baumhaus -= Math.Abs(value.Baumhaus);
+                this.Zelt -= Math.Abs(value.Zelt);
+                this.Berg -= Math.Abs(value.Berg);
+            }
+        }
+
+        public void AddGesammtTeilnehmer(AktionModel value) {
+            if (value.ForAll) {
+                this.Baumhaus += value.Baumhaus;
+                this.Zelt += value.Zelt;
+                this.Berg += value.Berg;
+            }
+        }
     }
     public class AktionenModel {
         private static AktionenModel? _Aktionen;
@@ -54,7 +98,7 @@ namespace BuildNRun.Model {
             if (_Aktionen is null) {
                 _Aktionen = new AktionenModel()
                     .AddAktion(
-                        new AktionModel("Schnee", 1, 0f, +0.1f, -0.1f,false),
+                        new AktionModel("Schnee", 1, 0f, +0.1f, -0.1f, false),
                         new AktionModel("Regen", 1, -0.1f, 0f, +0.1f, false),
                         new AktionModel("Sonne", 1, +0.1f, -0.1f, 0f, false),
                         new AktionModel("Pilze", 2, 0f, +0.1f, +0.1f, false),
@@ -80,8 +124,8 @@ namespace BuildNRun.Model {
             return this;
         }
 
-        public AktionModel? FindAktion(string aktion) 
+        public AktionModel? FindAktion(string aktion)
             => this.Aktionen.FirstOrDefault(a => string.Equals(a.Name, aktion, StringComparison.Ordinal));
-        
+
     }
 }

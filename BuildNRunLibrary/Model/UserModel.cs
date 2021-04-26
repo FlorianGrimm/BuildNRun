@@ -28,6 +28,7 @@ namespace BuildNRun.Model {
         Task SetName(string name);
         Task<bool> AddMoney(int money);
         Task KaufAktion(Guid userId, string aktion);
+        Task GewinnVerteilung(AktionModel nichtTeilnehmerAktion);
     }
 
     [Reentrant]
@@ -79,12 +80,39 @@ namespace BuildNRun.Model {
                 var userModel = this._User.State;
                 if (aktionModel.Level <= userModel.Money) {
                     userModel.Money -= aktionModel.Level;
-                    userModel.Baumhaus.Add(aktionModel.Baumhaus, false);
-                    userModel.Berg.Add(aktionModel.Berg, false);
-                    userModel.Zelt.Add(aktionModel.Zelt, false);
-                    await this._User.WriteStateAsync();
+
+                    if (aktionModel.ForAll) {
+                        userModel.Baumhaus.Add(aktionModel.Baumhaus, true);
+                        userModel.Berg.Add(aktionModel.Berg, true);
+                        userModel.Zelt.Add(aktionModel.Zelt, true);
+                        await this._User.WriteStateAsync();
+                        var abstimmungGrain = this.GrainFactory.GetGrain<IAbstimmungGrain>(0);
+                        var allUserIds = await abstimmungGrain.GetUserIds();
+                        foreach (var id in allUserIds) {
+                            if (id == userId) {
+                                continue;
+                            } else {
+                                var userGrain = this.GrainFactory.GetGrain<IUserGrain>(id);
+                                await userGrain.GewinnVerteilung(aktionModel);
+                            }
+                        }
+
+                    } else {
+                        userModel.Baumhaus.Add(aktionModel.Baumhaus, false);
+                        userModel.Berg.Add(aktionModel.Berg, false);
+                        userModel.Zelt.Add(aktionModel.Zelt, false);
+                        await this._User.WriteStateAsync();
+                    }
                 }
             }
+        }
+
+        public async Task GewinnVerteilung(AktionModel aktionModel) {
+            var userModel = this._User.State;
+            userModel.Baumhaus.Add(aktionModel.Baumhaus, true);
+            userModel.Berg.Add(aktionModel.Berg, true);
+            userModel.Zelt.Add(aktionModel.Zelt, true);
+            await this._User.WriteStateAsync();
         }
     }
 }
