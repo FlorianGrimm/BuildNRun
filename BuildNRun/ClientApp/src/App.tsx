@@ -30,7 +30,7 @@ export default class App extends Component<AppProps, AppState> {
             rootState: props.rootState
         };
     }
-
+    
     render() {
         return (
             <Router basename={this.props.appRootPath}>

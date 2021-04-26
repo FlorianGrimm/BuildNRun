@@ -3,11 +3,12 @@
 import React, { Component, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import RootState from './RootState';
 import {
-    Link
+    Link //, useHistory
 } from "react-router-dom";
-import GeoLocationService from './service/GeoLocationService';
+//import * as H from 'history';
+//import GeoLocationService from './service/GeoLocationService';
 import MapRoute from './service/MapRoute';
-import { useReduceAsync } from './useUtilities';
+//import { useReduceAsync } from './useUtilities';
 import { GeoCoordinates, GeoPosition } from './types';
 import { GeoLocation, LaufRouteModel, RoutenModel } from './service/client';
 import BingMapsService from './service/BingMapsService';
@@ -193,7 +194,14 @@ export default function PlanView(props: PlanViewProps) {
         // }
 
     }, [loadingState]);
+    // const history = useHistory();
+    
+    // useEffect(()=>{
+    //     const listener=()=>{
 
+    //     };
+    //     history.listen(listener)
+    // },[]);
     /*
     
         var directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
@@ -227,29 +235,32 @@ export default function PlanView(props: PlanViewProps) {
         if (mapRouteState && mapRouteState.map && mapRouteState.directionsManager) {
             const center = mapRouteState.map.getCenter()
             const directionsManager = mapRouteState.directionsManager;
-            const allWaypoints = directionsManager.getAllWaypoints();
-            const wp = allWaypoints.map((wp) => { wp.getLocation() });
-            /*
-                export class Location {
-                    // The location north or south of the equator from +90 to -90 
-                    public latitude: number;
-
-                    // The location east or west of the prime meridian +180 to -180 
-                    public longitude: number;
-
-            */
-            // for(let idx=0;idx<allWaypoints.length;idx++){
-            //     allWaypoints[idx].getLocation()
-            // }
-            // [2].getLocation()
+            const geoLocations=saveRoute(directionsManager);
+            if (model && model.routen && model.routen) {
+                if (idxRoute < model.routen.length) {
+                    model.routen[idxRoute] = new LaufRouteModel(
+                        {
+                            ...model.routen[idxRoute],
+                            wayPoints: geoLocations
+                        }
+                    );
+                }
+            }
+            
         }
     };
-    const handleNameChanged=(evt:React.ChangeEvent<HTMLInputElement>)=>{
-        if(      model && model.routen && model.routen){
-            if (idxRoute < model.routen.length){
+    const handleNameChanged = (evt: React.ChangeEvent<HTMLInputElement>) => {
+        if (model && model.routen && model.routen) {
+            if (idxRoute < model.routen.length) {
                 model.routen[idxRoute].name = evt.target.value;
             }
         }
+    };
+    const handleEdit=(idx:number)=>{
+        setIdxRoute(idx);
+    };
+    const handleLaufen=(idx:number)=>{
+
     };
     console.log("loadingState", loadingState);
     //
@@ -283,34 +294,26 @@ export default function PlanView(props: PlanViewProps) {
                                     </tr>
                                     {
                                         model && model.routen && model.routen.map((item, idx) => {
-                                            if (false) {
+                                            if (idxRoute === idx) {
                                                 return (
                                                     <tr key={idx}>
-                                                        <td><button>Lauf</button><br />
-                                                            <button>Bearbeiten</button>
+                                                        <td><button>Speichern</button><br />
+                                                            <button>Löschen</button></td>
+                                                        <td><input value={item.name} onChange={() => handleNameChanged} /></td>
+                                                        <td colSpan={2}>Wegepunkte</td>
+                                                    </tr>
+                                                );
+                                            } else {
+                                                return (
+                                                    <tr key={idx}>
+                                                        <td><button onClick={()=>handleLaufen(idx)}>Laufen</button><br />
+                                                            <button onClick={()=>handleEdit(idx)}>Bearbeiten</button>
                                                         </td>
                                                         <td>{item.name || ""}</td>
                                                         <td colSpan={2}>{item.wayPoints!.map((wp) => { return BingMapsService.convertDDToDMSString(wp.latitude!) + ":" + BingMapsService.convertDDToDMSString(wp.longitude!) + " " })}</td>
                                                     </tr>
                                                 );
                                             }
-                                            if (true) {
-                                                return (
-                                                    <tr key={idx}>
-                                                        <td><button>Speichern</button><br />
-                                                            <button>Löschen</button></td>
-                                                        <td><input value={item.name} onChange={()=>handleNameChanged} /></td>
-                                                        <td colSpan={2}>Wegepunkte</td>
-                                                    </tr>
-                                                );
-                                            }
-                                            return (
-                                                <tr key={idx}>
-                                                    <td>Name</td>
-                                                    <td><button onClick={() => handleNewRoute()}>new</button></td>
-                                                    <td colSpan={2}>Wegepunkte</td>
-                                                </tr>
-                                            );
                                         })
                                     }
 
